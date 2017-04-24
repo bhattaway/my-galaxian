@@ -25,11 +25,16 @@ class AquaAlien
 public:
     AquaAlien();
 
+    void run();
     void draw(Surface &);
 
-    Surface surface_;
+private:
     Rect rect_;
     Image image_;
+
+    int state_;
+    int dx_;
+    int dy_;
     
 };
 

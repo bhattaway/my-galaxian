@@ -46,28 +46,65 @@ void test_galaxian_alien()
 
     AquaAlien aqua;
 
-    aqua.rect_.x = 50;
-    aqua.rect_.y = 50;
     while (1)
     {
         if (event.poll() && event.type() == QUIT) break;
+
+        aqua.run();
+
         surface.lock();
         surface.fill(BLACK);
         aqua.draw(surface);
         surface.unlock();
         surface.flip();
 
-        delay(200);
+        delay(20);
         
     }
 }
 
 AquaAlien::AquaAlien()
     : image_("images/galaxian/GalaxianAquaAlien.gif"),
-    rect_(image_.getRect())
-{ }
+      state_(0),
+      dx_(3),
+      dy_(0)
+{ 
+    rect_ = image_.getRect();
+}
+
+void AquaAlien::run()
+{
+    switch (state_)
+    {
+        case 0: //passive in fleet
+            rect_.x += dx_;
+            if (rect_.x < 0)
+            {
+                rect_.x = 0;
+                dx_ = -dx_;
+            }
+            else if ((rect_.x + rect_.w) > (W - 1))
+            {
+                rect_.x = W - 1 - rect_.w;
+                dx_ = -dx_;
+            }
+
+            if (rand() % 100 == 0) state_ = 1;
+            break;
+        case 1: //attack
+            dy_ = 3;
+            rect_.y += dy_;
+            if (rect_.y > H)
+            {
+                rect_.y = 0;
+                state_ = 0;
+            }
+            break;
+    }
+}
 
 void AquaAlien::draw(Surface & surface) 
 {
     surface.put_image(image_, rect_);
 }
+

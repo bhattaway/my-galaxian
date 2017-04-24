@@ -643,6 +643,7 @@ void test_image()
 
         rect.x += dx;
         
+        std::cout << rect.w << std::endl;
         if (rect.x > W - rect.w)
         {
             dx = -2;

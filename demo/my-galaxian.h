@@ -20,6 +20,9 @@
 void test_galaxian_title_screen();
 void test_galaxian_alien();
 void test_galaxian_player_ship();
+void test_galaxian_kill_aliens();
+
+bool isCollision(const Rect &, const Rect &);
 
 class Alien
 {
@@ -52,6 +55,7 @@ private:
     Rect rect_;
 
     int state_;
+    bool isAlive_;
     int dx_;
     int dy_;
 };
@@ -69,6 +73,7 @@ private:
     static Image image_;
 
     int state_;
+    bool isAlive_;
     int dx_;
     int dy_;
 };
@@ -85,6 +90,7 @@ public:
 private:
     static Image image_;
 
+    bool isAlive_;
     int dx_;
     int dy_;
 };

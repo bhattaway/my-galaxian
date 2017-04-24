@@ -141,6 +141,49 @@ void test_galaxian_player_ship()
         delay(20);
     }
 }
+
+void test_galaxian_kill_aliens()
+{
+    Surface surface(W,H);
+    Event event;
+
+    //init aliens
+    int NUM_AQUA = 10;
+    std::cin >> NUM_AQUA;
+    Alien ** alien = new Alien*[NUM_AQUA];
+
+    for (int i = 0; i < NUM_AQUA / 2; ++i)
+    {
+        alien[i] = new AquaAlien(i,i*3);
+    }
+    for (int i = NUM_AQUA / 2; i < NUM_AQUA; ++i)
+    {
+        alien[i] = new RedAlien(i,i*3);
+    }
+
+    //init lasers and ship
+    const int LASER_SIZE = 100;
+    PlayerShip ship(0,H-32);
+    Laser laser[LASER_SIZE];
+}
+
+bool isCollision(const Rect & r0, const Rect & r1)
+{
+    int r0xp = r0.x + r0.w;
+    int r1xp = r1.x + r1.w;
+    bool x_overlap = (r0.x <= r1.x && r1.x <= r0xp)
+                    || (r0.x <= r1xp && r1xp <= r0xp)
+                    || (r1.x <= r0.x && r0.x <= r1xp);
+
+    int r0yp = r0.y + r0.h;
+    int r1yp = r1.y + r1.h;
+    bool y_overlap = (r0.y <= r1.y && r1.y <= r0yp)
+                    || (r0.y <= r1yp && r1yp <= r0yp)
+                    || (r1.y <= r0.y && r0.y <= r1yp);
+
+    return (x_overlap && y_overlap);
+}
+
 /*
 Alien::Alien(int x, int y)
     : state_(0),
@@ -157,6 +200,7 @@ Image AquaAlien::image_("images/galaxian/GalaxianAquaAlien.gif");
 
 AquaAlien::AquaAlien(int x, int y)
       : state_(0),
+      isAlive_(true),
       dx_(3),
       dy_(0)
 { 
@@ -168,44 +212,49 @@ AquaAlien::AquaAlien(int x, int y)
 
 void AquaAlien::run()
 {
-    switch (state_)
+    if (isAlive_)
     {
-        case 0: //passive in fleet
-            rect_.x += dx_;
-            if (rect_.x < 0)
-            {
-                rect_.x = 0;
-                dx_ = -dx_;
-            }
-            else if ((rect_.x + rect_.w) > (W - 1))
-            {
-                rect_.x = W - 1 - rect_.w;
-                dx_ = -dx_;
-            }
+        switch (state_)
+        {
+            case 0: //passive in fleet
+                rect_.x += dx_;
+                if (rect_.x < 0)
+                {
+                    rect_.x = 0;
+                    dx_ = -dx_;
+                }
+                else if ((rect_.x + rect_.w) > (W - 1))
+                {
+                    rect_.x = W - 1 - rect_.w;
+                    dx_ = -dx_;
+                }
 
-            if (rand() % 100 == 0) state_ = 1;
-            break;
-        case 1: //attack
-            dy_ = 3;
-            rect_.y += dy_;
-            if (rect_.y > H)
-            {
-                rect_.y = 0;
-                state_ = 0;
-            }
-            break;
+                if (rand() % 100 == 0) state_ = 1;
+                break;
+            case 1: //attack
+                dy_ = 3;
+                rect_.y += dy_;
+                if (rect_.y > H)
+                {
+                    rect_.y = 0;
+                    state_ = 0;
+                }
+                if (rand() % 1000 == 0) isAlive_ = false;
+                break;
+        }
     }
 }
 
 void AquaAlien::draw(Surface & surface) const
 {
-    surface.put_image(image_, rect_);
+    if (isAlive_) surface.put_image(image_, rect_);
 }
 
 Image RedAlien::image_("images/galaxian/GalaxianRedAlien.gif");
 
 RedAlien::RedAlien(int x, int y)
       : state_(0),
+      isAlive_(true),
       dx_(3),
       dy_(0)
 { 
@@ -217,45 +266,50 @@ RedAlien::RedAlien(int x, int y)
 
 void RedAlien::run()
 {
-    switch (state_)
+    if (isAlive_)
     {
-        case 0: //passive in fleet
-            rect_.x += dx_;
-            if (rect_.x < 0)
-            {
-                rect_.x = 0;
-                dx_ = -dx_;
-            }
-            else if ((rect_.x + rect_.w) > (W - 1))
-            {
-                rect_.x = W - 1 - rect_.w;
-                dx_ = -dx_;
-            }
+        switch (state_)
+        {
+            case 0: //passive in fleet
+                rect_.x += dx_;
+                if (rect_.x < 0)
+                {
+                    rect_.x = 0;
+                    dx_ = -dx_;
+                }
+                else if ((rect_.x + rect_.w) > (W - 1))
+                {
+                    rect_.x = W - 1 - rect_.w;
+                    dx_ = -dx_;
+                }
 
-            if (rand() % 100 == 0) state_ = 1;
-            break;
-        case 1: //attack
-            dy_ = 3;
-            rect_.y += dy_;
-            if (rect_.y > H)
-            {
-                rect_.y = 0;
-                state_ = 0;
-            }
-            break;
+                if (rand() % 100 == 0) state_ = 1;
+                break;
+            case 1: //attack
+                dy_ = 3;
+                rect_.y += dy_;
+                if (rect_.y > H)
+                {
+                    rect_.y = 0;
+                    state_ = 0;
+                }
+                break;
+        }
     }
 }
 
 void RedAlien::draw(Surface & surface) const
 {
-    surface.put_image(image_, rect_);
+    if (isAlive_) surface.put_image(image_, rect_);
 }
 
 
 Image PlayerShip::image_("images/galaxian/GalaxianGalaxip.gif");
 
 PlayerShip::PlayerShip(int x, int y)
-    : dx_(3)
+    : isAlive_(true),
+    dx_(3),
+    dy_(0)
 {
     rect_ = image_.getRect();
     rect_.x = x;
@@ -264,15 +318,15 @@ PlayerShip::PlayerShip(int x, int y)
 
 void PlayerShip::moveRight()
 {
-    rect_.x += dx_;
+    if (isAlive_) rect_.x += dx_;
 }
 void PlayerShip::moveLeft()
 {
-    rect_.x -= dx_;
+    if (isAlive_) rect_.x -= dx_;
 }
 void PlayerShip::draw(Surface & surface) const
 {
-    surface.put_image(image_, rect_);
+    if (isAlive_) surface.put_image(image_, rect_);
 }
 
 int Laser::timeOfLastLaser_ = 0;

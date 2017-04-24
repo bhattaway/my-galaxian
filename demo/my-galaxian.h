@@ -23,7 +23,7 @@ void test_galaxian_alien();
 class AquaAlien
 {
 public:
-    AquaAlien();
+    AquaAlien(int x = 0, int y = 0);
 
     void run();
     void draw(Surface &);

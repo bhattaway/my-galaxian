@@ -44,8 +44,14 @@ void test_galaxian_alien()
     Surface surface(W,H);
     Event event;
 
-    const int NUM_AQUA = 10;
-    AquaAlien aqua[NUM_AQUA];
+    int NUM_AQUA = 10;
+    std::cin >> NUM_AQUA;
+    AquaAlien ** aqua = new AquaAlien*[NUM_AQUA];
+
+    for (int i = 0; i < NUM_AQUA; ++i)
+    {
+        aqua[i] = new AquaAlien(i,i*5);
+    }
 
     while (1)
     {
@@ -53,14 +59,14 @@ void test_galaxian_alien()
 
         for (int i = 0; i < NUM_AQUA; ++i)
         {
-            aqua[i].run();
+            aqua[i]->run();
         }
 
         surface.lock();
         surface.fill(BLACK);
         for (int i = 0; i < NUM_AQUA; ++i)
         {
-            aqua[i].draw(surface);
+            aqua[i]->draw(surface);
         }
         surface.unlock();
         surface.flip();
@@ -68,16 +74,24 @@ void test_galaxian_alien()
         delay(20);
         
     }
+    for (int i = 0; i < NUM_AQUA; ++i)
+    {
+        delete aqua[i];
+    }
+    delete [] aqua;
 }
 
 Image AquaAlien::image_("images/galaxian/GalaxianAquaAlien.gif");
 
-AquaAlien::AquaAlien()
+AquaAlien::AquaAlien(int x, int y)
       : state_(0),
       dx_(3),
       dy_(0)
 { 
     rect_ = image_.getRect();
+    rect_.x = x;
+    rect_.y = y;
+
 }
 
 void AquaAlien::run()

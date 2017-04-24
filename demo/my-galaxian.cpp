@@ -85,6 +85,36 @@ void test_galaxian_alien()
     delete [] alien;
 }
 
+void test_galaxian_player_ship()
+{
+    Surface surface(W,H);
+    Event event;
+
+    PlayerShip ship(0,H-32);
+    while (1)
+    {
+        if (event.poll() && event.type() == QUIT) break;
+
+        KeyPressed keypressed = get_keypressed();
+
+        if (keypressed[LEFTARROW])
+        {
+            ship.moveLeft();
+        }
+        if (keypressed[RIGHTARROW])
+        {
+            ship.moveRight();
+        }
+
+        surface.lock();
+        surface.fill(BLACK);
+        ship.draw(surface);
+        surface.unlock();
+        surface.flip();
+
+        delay(20);
+    }
+}
 /*
 Alien::Alien(int x, int y)
     : state_(0),
@@ -195,3 +225,26 @@ void RedAlien::draw(Surface & surface) const
     surface.put_image(image_, rect_);
 }
 
+
+Image PlayerShip::image_("images/galaxian/GalaxianGalaxip.gif");
+
+PlayerShip::PlayerShip(int x, int y)
+    : dx_(3)
+{
+    rect_ = image_.getRect();
+    rect_.x = x;
+    rect_.y = y;
+}
+
+void PlayerShip::moveRight()
+{
+    rect_.x += dx_;
+}
+void PlayerShip::moveLeft()
+{
+    rect_.x -= dx_;
+}
+void PlayerShip::draw(Surface & surface) const
+{
+    surface.put_image(image_, rect_);
+}

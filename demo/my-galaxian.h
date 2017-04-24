@@ -19,6 +19,7 @@
 
 void test_galaxian_title_screen();
 void test_galaxian_alien();
+void test_galaxian_player_ship();
 
 class Alien
 {
@@ -68,6 +69,22 @@ private:
     static Image image_;
 
     int state_;
+    int dx_;
+    int dy_;
+};
+
+class PlayerShip
+{
+public:
+    PlayerShip(int x = 0, int y = W - 100);
+    void draw(Surface &) const;
+    void moveRight();
+    void moveLeft();
+
+private:
+    Rect rect_;
+    static Image image_;
+
     int dx_;
     int dy_;
 };

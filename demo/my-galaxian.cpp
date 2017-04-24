@@ -41,11 +41,33 @@ void test_galaxian_title_screen()
 
 void test_galaxian_alien()
 {
-    
-}
+    Surface surface(W,H);
+    Event event;
 
+    AquaAlien aqua;
+
+    aqua.rect_.x = 50;
+    aqua.rect_.y = 50;
+    while (1)
+    {
+        if (event.poll() && event.type() == QUIT) break;
+        surface.lock();
+        surface.fill(BLACK);
+        aqua.draw(surface);
+        surface.unlock();
+        surface.flip();
+
+        delay(200);
+        
+    }
+}
 
 AquaAlien::AquaAlien()
     : image_("images/galaxian/GalaxianAquaAlien.gif"),
     rect_(image_.getRect())
 { }
+
+void AquaAlien::draw(Surface & surface) 
+{
+    surface.put_image(image_, rect_);
+}

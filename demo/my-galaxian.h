@@ -25,6 +25,9 @@ class AquaAlien
 public:
     AquaAlien();
 
+    void draw(Surface &);
+
+    Surface surface_;
     Rect rect_;
     Image image_;
     

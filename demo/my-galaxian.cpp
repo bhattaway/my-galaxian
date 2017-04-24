@@ -44,17 +44,24 @@ void test_galaxian_alien()
     Surface surface(W,H);
     Event event;
 
-    AquaAlien aqua;
+    const int NUM_AQUA = 10;
+    AquaAlien aqua[NUM_AQUA];
 
     while (1)
     {
         if (event.poll() && event.type() == QUIT) break;
 
-        aqua.run();
+        for (int i = 0; i < NUM_AQUA; ++i)
+        {
+            aqua[i].run();
+        }
 
         surface.lock();
         surface.fill(BLACK);
-        aqua.draw(surface);
+        for (int i = 0; i < NUM_AQUA; ++i)
+        {
+            aqua[i].draw(surface);
+        }
         surface.unlock();
         surface.flip();
 

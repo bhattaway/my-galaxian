@@ -26,7 +26,7 @@ public:
     AquaAlien(int x = 0, int y = 0);
 
     void run();
-    void draw(Surface &);
+    void draw(Surface &) const;
 
 private:
     Rect rect_;
@@ -44,7 +44,7 @@ public:
     RedAlien(int x = 0, int y = 0);
 
     void run();
-    void draw(Surface &);
+    void draw(Surface &) const;
 
 private:
     Rect rect_;

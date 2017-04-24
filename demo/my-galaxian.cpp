@@ -129,7 +129,7 @@ void AquaAlien::run()
     }
 }
 
-void AquaAlien::draw(Surface & surface) 
+void AquaAlien::draw(Surface & surface) const
 {
     surface.put_image(image_, rect_);
 }
@@ -178,7 +178,7 @@ void RedAlien::run()
     }
 }
 
-void RedAlien::draw(Surface & surface) 
+void RedAlien::draw(Surface & surface) const
 {
     surface.put_image(image_, rect_);
 }

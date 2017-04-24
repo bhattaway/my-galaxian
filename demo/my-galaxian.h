@@ -30,7 +30,7 @@ public:
 
 private:
     Rect rect_;
-    Image image_;
+    static Image image_;
 
     int state_;
     int dx_;

@@ -63,9 +63,10 @@ void test_galaxian_alien()
     }
 }
 
+Image AquaAlien::image_("images/galaxian/GalaxianAquaAlien.gif");
+
 AquaAlien::AquaAlien()
-    : image_("images/galaxian/GalaxianAquaAlien.gif"),
-      state_(0),
+      : state_(0),
       dx_(3),
       dy_(0)
 { 

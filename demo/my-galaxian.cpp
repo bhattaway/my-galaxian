@@ -47,10 +47,12 @@ void test_galaxian_alien()
     int NUM_AQUA = 10;
     std::cin >> NUM_AQUA;
     AquaAlien ** aqua = new AquaAlien*[NUM_AQUA];
+    RedAlien ** red = new RedAlien*[NUM_AQUA];
 
     for (int i = 0; i < NUM_AQUA; ++i)
     {
         aqua[i] = new AquaAlien(i,i*5);
+        red[i] = new RedAlien(W - i,i*5);
     }
 
     while (1)
@@ -60,6 +62,7 @@ void test_galaxian_alien()
         for (int i = 0; i < NUM_AQUA; ++i)
         {
             aqua[i]->run();
+            red[i]->run();
         }
 
         surface.lock();
@@ -67,6 +70,7 @@ void test_galaxian_alien()
         for (int i = 0; i < NUM_AQUA; ++i)
         {
             aqua[i]->draw(surface);
+            red[i]->draw(surface);
         }
         surface.unlock();
         surface.flip();
@@ -126,6 +130,55 @@ void AquaAlien::run()
 }
 
 void AquaAlien::draw(Surface & surface) 
+{
+    surface.put_image(image_, rect_);
+}
+
+Image RedAlien::image_("images/galaxian/GalaxianRedAlien.gif");
+
+RedAlien::RedAlien(int x, int y)
+      : state_(0),
+      dx_(3),
+      dy_(0)
+{ 
+    rect_ = image_.getRect();
+    rect_.x = x;
+    rect_.y = y;
+
+}
+
+void RedAlien::run()
+{
+    switch (state_)
+    {
+        case 0: //passive in fleet
+            rect_.x += dx_;
+            if (rect_.x < 0)
+            {
+                rect_.x = 0;
+                dx_ = -dx_;
+            }
+            else if ((rect_.x + rect_.w) > (W - 1))
+            {
+                rect_.x = W - 1 - rect_.w;
+                dx_ = -dx_;
+            }
+
+            if (rand() % 100 == 0) state_ = 1;
+            break;
+        case 1: //attack
+            dy_ = 3;
+            rect_.y += dy_;
+            if (rect_.y > H)
+            {
+                rect_.y = 0;
+                state_ = 0;
+            }
+            break;
+    }
+}
+
+void RedAlien::draw(Surface & surface) 
 {
     surface.put_image(image_, rect_);
 }

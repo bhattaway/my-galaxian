@@ -38,5 +38,22 @@ private:
     
 };
 
+class RedAlien
+{
+public:
+    RedAlien(int x = 0, int y = 0);
+
+    void run();
+    void draw(Surface &);
+
+private:
+    Rect rect_;
+    static Image image_;
+
+    int state_;
+    int dx_;
+    int dy_;
+};
+
 #endif
 

@@ -165,6 +165,92 @@ void test_galaxian_kill_aliens()
     const int LASER_SIZE = 100;
     PlayerShip ship(0,H-32);
     Laser laser[LASER_SIZE];
+
+    //game loop
+    while (1)
+    {
+        if (event.poll() && event.type() == QUIT) break;
+
+        KeyPressed keypressed = get_keypressed();
+
+        if (keypressed[LEFTARROW])
+        {
+            ship.moveLeft();
+        }
+        if (keypressed[RIGHTARROW])
+        {
+            ship.moveRight();
+        }
+        if (keypressed[SPACE])
+        {
+            if (getTicks() - Laser::timeOfLastLaser_ > 500)
+            {
+                int i = 0;
+                while (laser[i].isAlive)
+                {
+                    ++i;
+                }
+
+                laser[i].isAlive = true;
+                laser[i].rect_.x = ship.rect_.x + ship.rect_.w / 2;
+                laser[i].rect_.y = ship.rect_.y - laser[i].rect_.h + 4;
+                Laser::timeOfLastLaser_ = getTicks();
+            }
+        }
+        //run stuff
+        for (int i = 0; i < LASER_SIZE; ++i)
+        {
+            laser[i].run();
+        }
+        for (int i = 0; i < NUM_AQUA; ++i)
+        {
+            alien[i]->run();
+        }
+
+        //check collision
+        for (int i = 0; i < LASER_SIZE; ++i)
+        {
+            if (laser[i].isAlive)
+            {
+                for (int j = 0; j < NUM_AQUA; ++j)
+                {
+                    if (alien[j]->isAlive())
+                    {
+                        if (isCollision(laser[i].rect_, alien[j]->rect()))
+                        {
+                            alien[j]->isAlive() = false;
+                            laser[i].isAlive = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        surface.lock();
+        surface.fill(BLACK);
+        //draw stuff
+        ship.draw(surface);
+        for (int i = 0; i < LASER_SIZE; ++i)
+        {
+            laser[i].draw(surface);
+        }
+        for (int i = 0; i < NUM_AQUA; ++i)
+        {
+            alien[i]->draw(surface);
+        }
+        surface.unlock();
+        surface.flip();
+
+        delay(20);
+        
+    }
+
+    //deleting memory
+    for (int i = 0; i < NUM_AQUA; ++i)
+    {
+        delete alien[i];
+    }
+    delete [] alien;
 }
 
 bool isCollision(const Rect & r0, const Rect & r1)
@@ -239,7 +325,6 @@ void AquaAlien::run()
                     rect_.y = 0;
                     state_ = 0;
                 }
-                if (rand() % 1000 == 0) isAlive_ = false;
                 break;
         }
     }
@@ -248,6 +333,14 @@ void AquaAlien::run()
 void AquaAlien::draw(Surface & surface) const
 {
     if (isAlive_) surface.put_image(image_, rect_);
+}
+bool & AquaAlien::isAlive()
+{
+    return isAlive_;
+}
+Rect & AquaAlien::rect()
+{
+    return rect_;
 }
 
 Image RedAlien::image_("images/galaxian/GalaxianRedAlien.gif");
@@ -301,6 +394,14 @@ void RedAlien::run()
 void RedAlien::draw(Surface & surface) const
 {
     if (isAlive_) surface.put_image(image_, rect_);
+}
+bool & RedAlien::isAlive()
+{
+    return isAlive_;
+}
+Rect & RedAlien::rect()
+{
+    return rect_;
 }
 
 

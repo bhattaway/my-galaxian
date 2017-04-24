@@ -31,6 +31,8 @@ public:
 
     virtual void run() = 0;
     virtual void draw(Surface &) const = 0;
+    virtual bool & isAlive() = 0;
+    virtual Rect & rect() = 0;
 
 /*
 //protected:
@@ -49,10 +51,12 @@ public:
 
     void run();
     void draw(Surface &) const;
+    bool & isAlive();
+    Rect & rect();
 
+    Rect rect_;
 private:
     static Image image_;
-    Rect rect_;
 
     int state_;
     bool isAlive_;
@@ -67,9 +71,11 @@ public:
 
     void run();
     void draw(Surface &) const;
+    bool & isAlive();
+    Rect & rect();
 
-private:
     Rect rect_;
+private:
     static Image image_;
 
     int state_;

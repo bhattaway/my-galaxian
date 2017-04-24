@@ -1161,9 +1161,9 @@ int main(int argc, char* argv[])
     //test_alien();
 
     //test_galaxian_title_screen(); //for my game
-    test_galaxian_alien();
+    //test_galaxian_alien();
     //test_galaxian_player_ship();
-    //test_galaxian_kill_aliens();
+    test_galaxian_kill_aliens();
 
     // mouse
     //test_mouse(); // NEW 2013

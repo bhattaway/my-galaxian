@@ -38,3 +38,14 @@ void test_galaxian_title_screen()
     }
     return;
 }
+
+void test_galaxian_alien()
+{
+    
+}
+
+
+AquaAlien::AquaAlien()
+    : image_("images/galaxian/GalaxianAquaAlien.gif"),
+    rect_(image_.getRect())
+{ }

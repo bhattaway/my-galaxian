@@ -18,6 +18,17 @@
 #include "Event.h"
 
 void test_galaxian_title_screen();
+void test_galaxian_alien();
+
+class AquaAlien
+{
+public:
+    AquaAlien();
+
+    Rect rect_;
+    Image image_;
+    
+};
 
 #endif
 

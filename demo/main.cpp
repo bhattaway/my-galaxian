@@ -18,6 +18,8 @@
 #include "Surface.h"
 #include "Event.h"
 
+#include "my-galaxian.h"
+
 /*****************************************************************************
 This is a short introduction to graphics, animation, sound, music, keyboard
 control. Together with software development techniques, you can develop any
@@ -1146,7 +1148,7 @@ int main(int argc, char* argv[])
 	//test_circle();
 	//test_unfilled_circle();
 	//test_rect();
-	test_image();
+	//test_image();
 	//helloworld();			// Of course we must have a hello world right?
 	//test_keyboard();
 	//test_key_up_down(); // NEW 2013
@@ -1156,6 +1158,8 @@ int main(int argc, char* argv[])
 	//test_polygon(true);
 
     //test_alien();
+
+    test_galaxian_title_screen(); //for my game
 
     // mouse
     //test_mouse(); // NEW 2013

@@ -81,9 +81,26 @@ public:
     void moveRight();
     void moveLeft();
 
-private:
     Rect rect_;
+private:
     static Image image_;
+
+    int dx_;
+    int dy_;
+};
+
+class Laser
+{
+public:
+    Laser(int x = 0, int y = 0);
+    void run();
+    void draw(Surface &) const;
+    
+    bool isAlive;
+    Rect rect_;
+    static int timeOfLastLaser_;
+private:
+    Color color_;
 
     int dx_;
     int dy_;

@@ -90,7 +90,9 @@ void test_galaxian_player_ship()
     Surface surface(W,H);
     Event event;
 
+    const int LASER_SIZE = 100;
     PlayerShip ship(0,H-32);
+    Laser laser[LASER_SIZE];
     while (1)
     {
         if (event.poll() && event.type() == QUIT) break;
@@ -105,10 +107,34 @@ void test_galaxian_player_ship()
         {
             ship.moveRight();
         }
+        if (keypressed[SPACE])
+        {
+            if (getTicks() - Laser::timeOfLastLaser_ > 500)
+            {
+                int i = 0;
+                while (laser[i].isAlive)
+                {
+                    ++i;
+                }
+
+                laser[i].isAlive = true;
+                laser[i].rect_.x = ship.rect_.x + ship.rect_.w / 2;
+                laser[i].rect_.y = ship.rect_.y - laser[i].rect_.h + 4;
+                Laser::timeOfLastLaser_ = getTicks();
+            }
+        }
+        for (int i = 0; i < LASER_SIZE; ++i)
+        {
+            laser[i].run();
+        }
 
         surface.lock();
         surface.fill(BLACK);
         ship.draw(surface);
+        for (int i = 0; i < LASER_SIZE; ++i)
+        {
+            laser[i].draw(surface);
+        }
         surface.unlock();
         surface.flip();
 
@@ -248,3 +274,32 @@ void PlayerShip::draw(Surface & surface) const
 {
     surface.put_image(image_, rect_);
 }
+
+int Laser::timeOfLastLaser_ = 0;
+Laser::Laser(int x, int y)
+    : dx_(0),
+    dy_(-4),
+    isAlive(true),
+    color_(RED)
+{
+    rect_.x = x;
+    rect_.y = y;
+    rect_.w = 2;
+    rect_.h = 8;
+}
+
+void Laser::run()
+{
+    if (isAlive)
+    {
+        rect_.x += dx_;
+        rect_.y += dy_;
+        if (rect_.y < 0 || rect_.y > H) isAlive = false;
+    }
+}
+
+void Laser::draw(Surface & surface) const
+{
+    if (isAlive) surface.put_rect(rect_, color_);
+}
+

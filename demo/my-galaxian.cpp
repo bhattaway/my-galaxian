@@ -46,13 +46,15 @@ void test_galaxian_alien()
 
     int NUM_AQUA = 10;
     std::cin >> NUM_AQUA;
-    AquaAlien ** aqua = new AquaAlien*[NUM_AQUA];
-    RedAlien ** red = new RedAlien*[NUM_AQUA];
+    Alien ** alien = new Alien*[NUM_AQUA];
 
-    for (int i = 0; i < NUM_AQUA; ++i)
+    for (int i = 0; i < NUM_AQUA / 2; ++i)
     {
-        aqua[i] = new AquaAlien(i,i*5);
-        red[i] = new RedAlien(W - i,i*5);
+        alien[i] = new AquaAlien(i,i*3);
+    }
+    for (int i = NUM_AQUA / 2; i < NUM_AQUA; ++i)
+    {
+        alien[i] = new RedAlien(i,i*3);
     }
 
     while (1)
@@ -61,16 +63,14 @@ void test_galaxian_alien()
 
         for (int i = 0; i < NUM_AQUA; ++i)
         {
-            aqua[i]->run();
-            red[i]->run();
+            alien[i]->run();
         }
 
         surface.lock();
         surface.fill(BLACK);
         for (int i = 0; i < NUM_AQUA; ++i)
         {
-            aqua[i]->draw(surface);
-            red[i]->draw(surface);
+            alien[i]->draw(surface);
         }
         surface.unlock();
         surface.flip();
@@ -80,10 +80,22 @@ void test_galaxian_alien()
     }
     for (int i = 0; i < NUM_AQUA; ++i)
     {
-        delete aqua[i];
+        delete alien[i];
     }
-    delete [] aqua;
+    delete [] alien;
 }
+
+/*
+Alien::Alien(int x, int y)
+    : state_(0),
+    dx_(3),
+    dy_(0)
+{
+    rect_ = image_.getRect();
+    rect_.x = x;
+    rect_.y = y;
+}
+*/
 
 Image AquaAlien::image_("images/galaxian/GalaxianAquaAlien.gif");
 

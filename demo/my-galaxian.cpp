@@ -112,14 +112,14 @@ void test_galaxian_player_ship()
             if (getTicks() - Laser::timeOfLastLaser_ > 500)
             {
                 int i = 0;
-                while (laser[i].isAlive)
+                while (laser[i].isAlive())
                 {
                     ++i;
                 }
 
-                laser[i].isAlive = true;
-                laser[i].rect_.x = ship.rect_.x + ship.rect_.w / 2;
-                laser[i].rect_.y = ship.rect_.y - laser[i].rect_.h + 4;
+                laser[i].isAlive() = true;
+                laser[i].rect().x = ship.rect().x + ship.rect().w / 2;
+                laser[i].rect().y = ship.rect().y - laser[i].rect().h + 4;
                 Laser::timeOfLastLaser_ = getTicks();
             }
         }
@@ -186,14 +186,14 @@ void test_galaxian_kill_aliens()
             if (getTicks() - Laser::timeOfLastLaser_ > 500)
             {
                 int i = 0;
-                while (laser[i].isAlive)
+                while (laser[i].isAlive())
                 {
                     ++i;
                 }
 
-                laser[i].isAlive = true;
-                laser[i].rect_.x = ship.rect_.x + ship.rect_.w / 2;
-                laser[i].rect_.y = ship.rect_.y - laser[i].rect_.h + 4;
+                laser[i].isAlive() = true;
+                laser[i].rect().x = ship.rect().x + ship.rect().w / 2;
+                laser[i].rect().y = ship.rect().y - laser[i].rect().h + 4;
                 Laser::timeOfLastLaser_ = getTicks();
             }
         }
@@ -210,16 +210,16 @@ void test_galaxian_kill_aliens()
         //check collision of lasers vs aliens
         for (int i = 0; i < LASER_SIZE; ++i)
         {
-            if (laser[i].isAlive)
+            if (laser[i].isAlive())
             {
                 for (int j = 0; j < NUM_AQUA; ++j)
                 {
                     if (alien[j]->isAlive())
                     {
-                        if (isCollision(laser[i].rect_, alien[j]->rect()))
+                        if (isCollision(laser[i].rect(), alien[j]->rect()))
                         {
                             alien[j]->isAlive() = false;
-                            laser[i].isAlive = false;
+                            laser[i].isAlive() = false;
                         }
                     }
                 }
@@ -231,7 +231,7 @@ void test_galaxian_kill_aliens()
         {
             if (alien[i]->isAlive())
             {
-                if (isCollision(alien[i]->rect(), ship.rect_) && ship.isAlive())
+                if (isCollision(alien[i]->rect(), ship.rect()) && ship.isAlive())
                 {
                     alien[i]->isAlive() = false;
                     ship.isAlive() = false;
@@ -472,11 +472,19 @@ PlayerShip::PlayerShip(int x, int y)
 
 void PlayerShip::moveRight()
 {
-    if (isAlive_) rect_.x += dx_;
+    if (isAlive_)
+    {
+        rect_.x += dx_;
+        if (rect_.x + rect_.w > W) rect_.x = W - rect_.w;
+    }
 }
 void PlayerShip::moveLeft()
 {
-    if (isAlive_) rect_.x -= dx_;
+    if (isAlive_)
+    {
+        rect_.x -= dx_;
+        if (rect_.x < 0) rect_.x = 0;
+    }
 }
 void PlayerShip::draw(Surface & surface) const
 {
@@ -486,12 +494,16 @@ bool & PlayerShip::isAlive()
 {
     return isAlive_;
 }
+Rect & PlayerShip::rect()
+{
+    return rect_;
+}
 
 int Laser::timeOfLastLaser_ = 0;
 Laser::Laser(int x, int y)
     : dx_(0),
     dy_(-4),
-    isAlive(true),
+    isAlive_(true),
     color_(RED)
 {
     rect_.x = x;
@@ -502,17 +514,25 @@ Laser::Laser(int x, int y)
 
 void Laser::run()
 {
-    if (isAlive)
+    if (isAlive_)
     {
         rect_.x += dx_;
         rect_.y += dy_;
-        if (rect_.y < 0 || rect_.y > H) isAlive = false;
+        if (rect_.y < 0 || rect_.y > H) isAlive_ = false;
     }
 }
 
 void Laser::draw(Surface & surface) const
 {
-    if (isAlive) surface.put_rect(rect_, color_);
+    if (isAlive_) surface.put_rect(rect_, color_);
+}
+bool & Laser::isAlive()
+{
+    return isAlive_;
+}
+Rect & Laser::rect()
+{
+    return rect_;
 }
 
 Star::Star(int x, int y)

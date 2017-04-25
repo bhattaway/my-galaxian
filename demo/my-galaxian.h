@@ -55,8 +55,8 @@ public:
     bool & isAlive();
     Rect & rect();
 
-    Rect rect_;
 private:
+    Rect rect_;
     static Image image_;
 
     int state_;
@@ -75,8 +75,8 @@ public:
     bool & isAlive();
     Rect & rect();
 
-    Rect rect_;
 private:
+    Rect rect_;
     static Image image_;
 
     int state_;
@@ -93,9 +93,10 @@ public:
     void moveRight();
     void moveLeft();
     bool & isAlive();
+    Rect & rect();
 
-    Rect rect_;
 private:
+    Rect rect_;
     static Image image_;
 
     bool isAlive_;
@@ -109,11 +110,13 @@ public:
     Laser(int x = 0, int y = 0);
     void run();
     void draw(Surface &) const;
+    bool & isAlive();
+    Rect & rect();
     
-    bool isAlive;
-    Rect rect_;
     static int timeOfLastLaser_;
 private:
+    bool isAlive_;
+    Rect rect_;
     Color color_;
 
     int dx_;

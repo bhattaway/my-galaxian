@@ -1163,8 +1163,8 @@ int main(int argc, char* argv[])
     //test_galaxian_title_screen(); //for my game
     //test_galaxian_alien();
     //test_galaxian_player_ship();
-    //test_galaxian_kill_aliens();
-    test_galaxian_starfield();
+    test_galaxian_kill_aliens();
+    //test_galaxian_starfield();
 
     // mouse
     //test_mouse(); // NEW 2013

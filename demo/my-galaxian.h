@@ -48,6 +48,7 @@ public:
     virtual void draw(Surface &) const = 0;
     virtual bool & isAlive() = 0;
     virtual Rect & rect() = 0;
+    virtual int & state() = 0;
 
 /*
 //protected:
@@ -68,6 +69,7 @@ public:
     void draw(Surface &) const;
     bool & isAlive();
     Rect & rect();
+    int & state();
 
 private:
     Rect rect_;
@@ -88,6 +90,7 @@ public:
     void draw(Surface &) const;
     bool & isAlive();
     Rect & rect();
+    int & state();
 
 private:
     Rect rect_;
@@ -108,6 +111,7 @@ public:
     void draw(Surface &) const;
     bool & isAlive();
     Rect & rect();
+    int & state();
 
 private:
     Rect rect_;
@@ -127,6 +131,7 @@ public:
     void draw(Surface &) const;
     bool & isAlive();
     Rect & rect();
+    int & state();
 
 private:
     Rect rect_;

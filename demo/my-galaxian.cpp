@@ -442,6 +442,26 @@ void Fleet::delete_alien()
 }
 void Fleet::run()
 {
+    if (alien[0][0]->rect().x < 10)
+    {
+        for (int row = 0; row < 6; ++row)
+        {
+            for (int col = 0; col < 10; ++col)
+            {
+                alien[row][col]->state() = 0;
+            }
+        }
+    }
+    if (alien[0][9]->rect().x + 32 > W - 10)
+    {
+        for (int row = 0; row < 6; ++row)
+        {
+            for (int col = 0; col < 10; ++col)
+            {
+                alien[row][col]->state() = 1;
+            }
+        }
+    }
     for (int row = 0; row < 6; ++row)
     {
         for (int col = 0; col < 10; ++col)
@@ -482,22 +502,36 @@ void AquaAlien::run()
     {
         switch (state_)
         {
-            case 0: //passive in fleet
+            case 0: //passive in fleet, moving right
                 rect_.x += dx_;
                 if (rect_.x < 0)
                 {
                     rect_.x = 0;
-                    dx_ = -dx_;
+                    //dx_ = -dx_;
                 }
                 else if ((rect_.x + rect_.w) > (W - 1))
                 {
                     rect_.x = W - 1 - rect_.w;
-                    dx_ = -dx_;
+                    //dx_ = -dx_;
                 }
 
                 //if (rand() % 100 == 0) state_ = 1;
                 break;
-            case 1: //attack
+            case 1: //passive in fleet, moving left
+                rect_.x -= dx_;
+
+                if (rect_.x < 0)
+                {
+                    rect_.x = 0;
+                    //dx_ = -dx_;
+                }
+                else if ((rect_.x + rect_.w) > (W - 1))
+                {
+                    rect_.x = W - 1 - rect_.w;
+                    //dx_ = -dx_;
+                }
+                break;
+            case 2: //attack
                 dy_ = 3;
                 rect_.y += dy_;
                 if (rect_.y > H)
@@ -522,6 +556,10 @@ Rect & AquaAlien::rect()
 {
     return rect_;
 }
+int & AquaAlien::state()
+{
+    return state_;
+}
 
 Image RedAlien::image_("images/galaxian/GalaxianRedAlien.gif");
 
@@ -543,22 +581,36 @@ void RedAlien::run()
     {
         switch (state_)
         {
-            case 0: //passive in fleet
+            case 0: //passive in fleet, moving right
                 rect_.x += dx_;
                 if (rect_.x < 0)
                 {
                     rect_.x = 0;
-                    dx_ = -dx_;
+                    //dx_ = -dx_;
                 }
                 else if ((rect_.x + rect_.w) > (W - 1))
                 {
                     rect_.x = W - 1 - rect_.w;
-                    dx_ = -dx_;
+                    //dx_ = -dx_;
                 }
 
                 //if (rand() % 100 == 0) state_ = 1;
                 break;
-            case 1: //attack
+            case 1: //passive in fleet, moving left
+                rect_.x -= dx_;
+
+                if (rect_.x < 0)
+                {
+                    rect_.x = 0;
+                    //dx_ = -dx_;
+                }
+                else if ((rect_.x + rect_.w) > (W - 1))
+                {
+                    rect_.x = W - 1 - rect_.w;
+                    //dx_ = -dx_;
+                }
+                break;
+            case 2: //attack
                 dy_ = 3;
                 rect_.y += dy_;
                 if (rect_.y > H)
@@ -583,6 +635,10 @@ Rect & RedAlien::rect()
 {
     return rect_;
 }
+int & RedAlien::state()
+{
+    return state_;
+}
 
 Image PurpleAlien::image_("images/galaxian/GalaxianPurpleAlien.gif");
 
@@ -604,22 +660,36 @@ void PurpleAlien::run()
     {
         switch (state_)
         {
-            case 0: //passive in fleet
+            case 0: //passive in fleet, moving right
                 rect_.x += dx_;
                 if (rect_.x < 0)
                 {
                     rect_.x = 0;
-                    dx_ = -dx_;
+                    //dx_ = -dx_;
                 }
                 else if ((rect_.x + rect_.w) > (W - 1))
                 {
                     rect_.x = W - 1 - rect_.w;
-                    dx_ = -dx_;
+                    //dx_ = -dx_;
                 }
 
                 //if (rand() % 100 == 0) state_ = 1;
                 break;
-            case 1: //attack
+            case 1: //passive in fleet, moving left
+                rect_.x -= dx_;
+
+                if (rect_.x < 0)
+                {
+                    rect_.x = 0;
+                    //dx_ = -dx_;
+                }
+                else if ((rect_.x + rect_.w) > (W - 1))
+                {
+                    rect_.x = W - 1 - rect_.w;
+                    //dx_ = -dx_;
+                }
+                break;
+            case 2: //attack
                 dy_ = 3;
                 rect_.y += dy_;
                 if (rect_.y > H)
@@ -644,6 +714,10 @@ Rect & PurpleAlien::rect()
 {
     return rect_;
 }
+int & PurpleAlien::state()
+{
+    return state_;
+}
 
 Image YellowAlien::image_("images/galaxian/GalaxianFlagship.gif");
 
@@ -665,22 +739,36 @@ void YellowAlien::run()
     {
         switch (state_)
         {
-            case 0: //passive in fleet
+            case 0: //passive in fleet, moving right
                 rect_.x += dx_;
                 if (rect_.x < 0)
                 {
                     rect_.x = 0;
-                    dx_ = -dx_;
+                    //dx_ = -dx_;
                 }
                 else if ((rect_.x + rect_.w) > (W - 1))
                 {
                     rect_.x = W - 1 - rect_.w;
-                    dx_ = -dx_;
+                    //dx_ = -dx_;
                 }
 
                 //if (rand() % 100 == 0) state_ = 1;
                 break;
-            case 1: //attack
+            case 1: //passive in fleet, moving left
+                rect_.x -= dx_;
+
+                if (rect_.x < 0)
+                {
+                    rect_.x = 0;
+                    //dx_ = -dx_;
+                }
+                else if ((rect_.x + rect_.w) > (W - 1))
+                {
+                    rect_.x = W - 1 - rect_.w;
+                    //dx_ = -dx_;
+                }
+                break;
+            case 2: //attack
                 dy_ = 3;
                 rect_.y += dy_;
                 if (rect_.y > H)
@@ -704,6 +792,10 @@ bool & YellowAlien::isAlive()
 Rect & YellowAlien::rect()
 {
     return rect_;
+}
+int & YellowAlien::state()
+{
+    return state_;
 }
 
 

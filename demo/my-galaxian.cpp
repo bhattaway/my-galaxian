@@ -266,6 +266,36 @@ void test_galaxian_kill_aliens()
     delete [] alien;
 }
 
+void test_galaxian_starfield()
+{
+    Surface surface(W,H);
+    Event event;
+
+    //init stars
+    const int NUM_STARS = 50;
+    Star star[NUM_STARS];
+    while (1)
+    {
+        if (event.poll() && event.type() == QUIT) break;
+        for (int i = 0; i < NUM_STARS; ++i)
+        {
+            star[i].run();
+        }
+
+        surface.lock();
+        surface.fill(BLACK);
+        for (int i = 0; i < NUM_STARS; ++i)
+        {
+            star[i].draw(surface);
+        }
+        surface.unlock();
+        surface.flip();
+
+        delay(20);
+
+    }
+}
+
 bool isCollision(const Rect & r0, const Rect & r1)
 {
     int r0xp = r0.x + r0.w; //stands for r0.x(prime)
@@ -483,5 +513,34 @@ void Laser::run()
 void Laser::draw(Surface & surface) const
 {
     if (isAlive) surface.put_rect(rect_, color_);
+}
+
+Star::Star(int x, int y)
+    : dx_(0),
+    dy_(rand() % 4 + 1),
+    color_(rand_color())
+{
+    rect_.x = rand() % W;
+    rect_.y = rand() % H;
+    rect_.w = 1;
+    rect_.h = 1;
+}
+void Star::run()
+{
+    rect_.y += dy_;
+    if (rect_.y > H) 
+    {
+        rect_.x = rand() % W;
+        rect_.y = 0;
+        dy_ = rand() % 4 + 1;
+        color_ = rand_color();
+    }
+    //color_.R;
+    //color_.G += dG_;
+    //color_.B += dB_;
+}
+void Star::draw(Surface & surface) const
+{
+    surface.put_rect(rect_, color_);
 }
 

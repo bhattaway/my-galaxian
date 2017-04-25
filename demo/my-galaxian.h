@@ -21,6 +21,7 @@ void test_galaxian_title_screen();
 void test_galaxian_alien();
 void test_galaxian_player_ship();
 void test_galaxian_kill_aliens();
+void test_galaxian_starfield();
 
 bool isCollision(const Rect &, const Rect &);
 
@@ -117,6 +118,21 @@ private:
 
     int dx_;
     int dy_;
+};
+
+class Star
+{
+public:
+    Star(int x = 0, int y = 0);
+    void run();
+    void draw(Surface &) const;
+private:
+    Rect rect_;
+    Color color_;
+
+    int dx_;
+    int dy_;
+    int dcolor_;
 };
 
 #endif

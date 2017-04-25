@@ -85,6 +85,45 @@ private:
     int dy_;
 };
 
+class PurpleAlien : public Alien
+{
+public:
+    PurpleAlien(int x = 0, int y = 0);
+
+    void run();
+    void draw(Surface &) const;
+    bool & isAlive();
+    Rect & rect();
+
+private:
+    Rect rect_;
+    static Image image_;
+
+    int state_;
+    bool isAlive_;
+    int dx_;
+    int dy_;
+};
+class YellowAlien : public Alien
+{
+public:
+    YellowAlien(int x = 0, int y = 0);
+
+    void run();
+    void draw(Surface &) const;
+    bool & isAlive();
+    Rect & rect();
+
+private:
+    Rect rect_;
+    static Image image_;
+
+    int state_;
+    bool isAlive_;
+    int dx_;
+    int dy_;
+};
+
 class PlayerShip
 {
 public:

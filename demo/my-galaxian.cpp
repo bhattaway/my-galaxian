@@ -152,13 +152,21 @@ void test_galaxian_kill_aliens()
     std::cin >> NUM_AQUA;
     Alien ** alien = new Alien*[NUM_AQUA];
 
-    for (int i = 0; i < NUM_AQUA / 2; ++i)
+    for (int i = 0; i < NUM_AQUA / 4; ++i)
     {
         alien[i] = new AquaAlien(i,i*3);
     }
-    for (int i = NUM_AQUA / 2; i < NUM_AQUA; ++i)
+    for (int i = NUM_AQUA / 4; i < NUM_AQUA / 2; ++i)
     {
         alien[i] = new RedAlien(i,i*3);
+    }
+    for (int i = NUM_AQUA / 2; i < NUM_AQUA * 3 / 4; ++i)
+    {
+        alien[i] = new PurpleAlien(i,i*3);
+    }
+    for (int i = NUM_AQUA * 3 / 4; i < NUM_AQUA; ++i)
+    {
+        alien[i] = new YellowAlien(i,i*3);
     }
 
     //init lasers and ship
@@ -485,6 +493,128 @@ bool & RedAlien::isAlive()
     return isAlive_;
 }
 Rect & RedAlien::rect()
+{
+    return rect_;
+}
+
+Image PurpleAlien::image_("images/galaxian/GalaxianPurpleAlien.gif");
+
+PurpleAlien::PurpleAlien(int x, int y)
+      : state_(0),
+      isAlive_(true),
+      dx_(3),
+      dy_(0)
+{ 
+    rect_ = image_.getRect();
+    rect_.x = x;
+    rect_.y = y;
+
+}
+
+void PurpleAlien::run()
+{
+    if (isAlive_)
+    {
+        switch (state_)
+        {
+            case 0: //passive in fleet
+                rect_.x += dx_;
+                if (rect_.x < 0)
+                {
+                    rect_.x = 0;
+                    dx_ = -dx_;
+                }
+                else if ((rect_.x + rect_.w) > (W - 1))
+                {
+                    rect_.x = W - 1 - rect_.w;
+                    dx_ = -dx_;
+                }
+
+                if (rand() % 100 == 0) state_ = 1;
+                break;
+            case 1: //attack
+                dy_ = 3;
+                rect_.y += dy_;
+                if (rect_.y > H)
+                {
+                    rect_.y = 0;
+                    state_ = 0;
+                }
+                break;
+        }
+    }
+}
+
+void PurpleAlien::draw(Surface & surface) const
+{
+    if (isAlive_) surface.put_image(image_, rect_);
+}
+bool & PurpleAlien::isAlive()
+{
+    return isAlive_;
+}
+Rect & PurpleAlien::rect()
+{
+    return rect_;
+}
+
+Image YellowAlien::image_("images/galaxian/GalaxianFlagship.gif");
+
+YellowAlien::YellowAlien(int x, int y)
+      : state_(0),
+      isAlive_(true),
+      dx_(3),
+      dy_(0)
+{ 
+    rect_ = image_.getRect();
+    rect_.x = x;
+    rect_.y = y;
+
+}
+
+void YellowAlien::run()
+{
+    if (isAlive_)
+    {
+        switch (state_)
+        {
+            case 0: //passive in fleet
+                rect_.x += dx_;
+                if (rect_.x < 0)
+                {
+                    rect_.x = 0;
+                    dx_ = -dx_;
+                }
+                else if ((rect_.x + rect_.w) > (W - 1))
+                {
+                    rect_.x = W - 1 - rect_.w;
+                    dx_ = -dx_;
+                }
+
+                if (rand() % 100 == 0) state_ = 1;
+                break;
+            case 1: //attack
+                dy_ = 3;
+                rect_.y += dy_;
+                if (rect_.y > H)
+                {
+                    rect_.y = 0;
+                    state_ = 0;
+                }
+                break;
+        }
+    }
+}
+
+void YellowAlien::draw(Surface & surface) const
+{
+    if (isAlive_) surface.put_image(image_, rect_);
+}
+bool & YellowAlien::isAlive()
+{
+    return isAlive_;
+}
+Rect & YellowAlien::rect()
 {
     return rect_;
 }

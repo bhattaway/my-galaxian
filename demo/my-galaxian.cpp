@@ -428,6 +428,8 @@ void test_galaxian_fleet()
 
         //handle collisions: lasers vs aliens
         fleet.do_collision(laser, LASER_SIZE);
+        //collisions: aliens vs playership
+        fleet.do_collision(ship);
 
         surface.lock();
         surface.fill(BLACK);
@@ -586,7 +588,41 @@ void Fleet::do_collision(Laser laser[], int laser_size)
             }
         }
     }
+}
+void Fleet::do_collision(PlayerShip & ship)
+{
+    //check collision of aliens vs player ship
+    for (int row = 0; row < NUM_ROWS; ++row)
+    {
+        for (int col = 0; col < NUM_COLS; ++col)
+        {
+            if (alien[row][col]->isAlive()
+               && alien[row][col]->state() == 2
+               && isCollision(alien[row][col]->rect(), ship.rect())
+               && ship.isAlive)
+            {
+                /*
+                int k = 0;
+                while (explosion[k].isAlive())
+                    ++k;
 
+                explosion[k].set(alien[i]->rect().x + alien[i]->rect().w / 2, 
+                                 alien[i]->rect().y + alien[i]->rect().h / 2);
+
+                k = 0;
+                while (explosion[k].isAlive())
+                    ++k;
+
+                //explosion for player ship
+                explosion[k].set(ship.rect().x + ship.rect().w / 2, 
+                                 ship.rect().y + ship.rect().h / 2);
+                                 */
+
+                alien[i]->isAlive() = false;
+                ship.isAlive() = false;
+            }
+        }
+    }
 }
 
 

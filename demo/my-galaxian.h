@@ -17,6 +17,11 @@
 #include "Surface.h"
 #include "Event.h"
 
+//constants for rows and columns for the fleet
+//TODO: make the fleet array dynamic
+const int NUM_ROWS = 6;
+const int NUM_COLS = 10;
+
 void test_galaxian_title_screen();
 void test_galaxian_alien();
 void test_galaxian_player_ship();
@@ -28,6 +33,7 @@ bool isCollision(const Rect &, const Rect &);
 
 class Alien;
 class Laser;
+class PlayerShip;
 
 class Fleet
 {
@@ -37,7 +43,8 @@ public:
     void run();
     void draw(Surface &) const;
     void do_collision(Laser [], int);
-    Alien * alien[6][10];
+    void do_collision(PlayerShip &);
+    Alien * alien[NUM_ROWS][NUM_COLS];
 private:
 };
 

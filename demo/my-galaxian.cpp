@@ -360,21 +360,98 @@ void test_galaxian_fleet()
     Event event;
     Fleet fleet;
 
+    //init fleet
     fleet.init();
+    //init lasers and ship
+    const int LASER_SIZE = 100;
+    PlayerShip ship(0,H-32);
+    Laser laser[LASER_SIZE];
 
+    //init explosion
+    const int NUM_EXPLOSIONS = 100;
+    Explosion explosion[NUM_EXPLOSIONS];
+
+    //init stars
+    const int NUM_STARS = 50;
+    Star star[NUM_STARS];
+
+    const int FRAME_RATE = 1000 / 30;
+
+    //game loop
     while (1)
     {
         if (event.poll() && event.type() == QUIT) break;
 
+        int frame_start = getTicks();
+        //handle input
+        KeyPressed keypressed = get_keypressed();
+
+        if (keypressed[LEFTARROW])
+        {
+            ship.moveLeft();
+        }
+        if (keypressed[RIGHTARROW])
+        {
+            ship.moveRight();
+        }
+        if (keypressed[SPACE] && ship.isAlive())
+        {
+            if (getTicks() - Laser::timeOfLastLaser_ > 500)
+            {
+                int i = 0;
+                while (laser[i].isAlive())
+                {
+                    ++i;
+                }
+
+                laser[i].isAlive() = true;
+                laser[i].rect().x = ship.rect().x + ship.rect().w / 2;
+                laser[i].rect().y = ship.rect().y - laser[i].rect().h + 4;
+                Laser::timeOfLastLaser_ = getTicks();
+            }
+        }
+
+        //run stuff
         fleet.run();
+        for (int i = 0; i < NUM_STARS; ++i)
+        {
+            star[i].run();
+        }
+        for (int i = 0; i < LASER_SIZE; ++i)
+        {
+            laser[i].run();
+        }
+        for (int i = 0; i < NUM_EXPLOSIONS; ++i)
+        {
+            explosion[i].run();
+        }
+
+        //handle collisions: lasers vs aliens
+        fleet.do_collision(laser, LASER_SIZE);
 
         surface.lock();
         surface.fill(BLACK);
+        //draw stuff
+        for (int i = 0; i < NUM_STARS; ++i)
+        {
+            star[i].draw(surface);
+        }
+        ship.draw(surface);
+        for (int i = 0; i < LASER_SIZE; ++i)
+        {
+            laser[i].draw(surface);
+        }
+        for (int i = 0; i < NUM_EXPLOSIONS; ++i)
+        {
+            explosion[i].draw(surface);
+        }
         fleet.draw(surface);
         surface.unlock();
         surface.flip();
 
-        delay(30);
+        int frame_end = getTicks();
+        int delaytime = FRAME_RATE - frame_end + frame_start;
+        if (delaytime > 0) delay(delaytime);
     }
 
     fleet.delete_alien();
@@ -479,6 +556,37 @@ void Fleet::draw(Surface & surface) const
             alien[row][col]->draw(surface);
         }
     }
+}
+void Fleet::do_collision(Laser laser[], int laser_size)
+{
+    //each laser vs each alien
+    for (int i = 0; i < laser_size; ++i)
+    {
+        if (laser[i].isAlive())
+        {
+            for (int row = 0; row < 6; ++row)
+            {
+                for (int col = 0; col < 10; ++col)
+                {
+                    if (alien[row][col]->isAlive() 
+                      && isCollision(laser[i].rect(), alien[row][col]->rect()))
+                    {
+                        /*
+                        int k = 0;
+                        while (explosion[k].isAlive())
+                            ++k;
+
+                        explosion[k].set(alien[j]->rect().x + alien[j]->rect().w / 2,
+                                         alien[j]->rect().y + alien[j]->rect().h / 2);
+                                         */
+                        alien[row][col]->isAlive() = false;
+                        laser[i].isAlive() = false;
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 

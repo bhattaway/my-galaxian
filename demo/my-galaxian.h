@@ -27,6 +27,7 @@ void test_galaxian_fleet();
 bool isCollision(const Rect &, const Rect &);
 
 class Alien;
+class Laser;
 
 class Fleet
 {
@@ -35,6 +36,7 @@ public:
     void delete_alien();
     void run();
     void draw(Surface &) const;
+    void do_collision(Laser [], int);
     Alien * alien[6][10];
 private:
 };

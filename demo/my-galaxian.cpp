@@ -170,7 +170,7 @@ void test_galaxian_kill_aliens()
     while (1)
     {
         if (event.poll() && event.type() == QUIT) break;
-
+        //handle input
         KeyPressed keypressed = get_keypressed();
 
         if (keypressed[LEFTARROW])
@@ -181,7 +181,7 @@ void test_galaxian_kill_aliens()
         {
             ship.moveRight();
         }
-        if (keypressed[SPACE])
+        if (keypressed[SPACE] && ship.isAlive())
         {
             if (getTicks() - Laser::timeOfLastLaser_ > 500)
             {
@@ -207,7 +207,7 @@ void test_galaxian_kill_aliens()
             alien[i]->run();
         }
 
-        //check collision
+        //check collision of lasers vs aliens
         for (int i = 0; i < LASER_SIZE; ++i)
         {
             if (laser[i].isAlive)
@@ -222,6 +222,19 @@ void test_galaxian_kill_aliens()
                             laser[i].isAlive = false;
                         }
                     }
+                }
+            }
+        }
+
+        //check collision of aliens vs player ship
+        for (int i = 0; i < NUM_AQUA; ++i)
+        {
+            if (alien[i]->isAlive())
+            {
+                if (isCollision(alien[i]->rect(), ship.rect_) && ship.isAlive())
+                {
+                    alien[i]->isAlive() = false;
+                    ship.isAlive() = false;
                 }
             }
         }
@@ -255,19 +268,29 @@ void test_galaxian_kill_aliens()
 
 bool isCollision(const Rect & r0, const Rect & r1)
 {
-    int r0xp = r0.x + r0.w;
+    int r0xp = r0.x + r0.w; //stands for r0.x(prime)
     int r1xp = r1.x + r1.w;
+    /*
     bool x_overlap = (r0.x <= r1.x && r1.x <= r0xp)
                     || (r0.x <= r1xp && r1xp <= r0xp)
                     || (r1.x <= r0.x && r0.x <= r1xp);
+                    */
 
     int r0yp = r0.y + r0.h;
     int r1yp = r1.y + r1.h;
+    /*
     bool y_overlap = (r0.y <= r1.y && r1.y <= r0yp)
                     || (r0.y <= r1yp && r1yp <= r0yp)
                     || (r1.y <= r0.y && r0.y <= r1yp);
+                    */
 
-    return (x_overlap && y_overlap);
+    return (((r0.x <= r1.x && r1.x <= r0xp) //x_overlap
+                    || (r0.x <= r1xp && r1xp <= r0xp)
+                    || (r1.x <= r0.x && r0.x <= r1xp))
+            && ((r0.y <= r1.y && r1.y <= r0yp) //y_overlap
+                    || (r0.y <= r1yp && r1yp <= r0yp)
+                    || (r1.y <= r0.y && r0.y <= r1yp)));
+    //return (x_overlap && y_overlap);
 }
 
 /*
@@ -428,6 +451,10 @@ void PlayerShip::moveLeft()
 void PlayerShip::draw(Surface & surface) const
 {
     if (isAlive_) surface.put_image(image_, rect_);
+}
+bool & PlayerShip::isAlive()
+{
+    return isAlive_;
 }
 
 int Laser::timeOfLastLaser_ = 0;

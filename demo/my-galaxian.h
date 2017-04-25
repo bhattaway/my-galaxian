@@ -91,6 +91,7 @@ public:
     void draw(Surface &) const;
     void moveRight();
     void moveLeft();
+    bool & isAlive();
 
     Rect rect_;
 private:

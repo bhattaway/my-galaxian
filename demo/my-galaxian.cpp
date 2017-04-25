@@ -178,10 +178,17 @@ void test_galaxian_kill_aliens()
     const int NUM_EXPLOSIONS = 100;
     Explosion explosion[NUM_EXPLOSIONS];
 
+    //init stars
+    const int NUM_STARS = 50;
+    Star star[NUM_STARS];
+
+    const int FRAME_RATE = 1000 / 30;
+
     //game loop
     while (1)
     {
         if (event.poll() && event.type() == QUIT) break;
+        int frame_start = getTicks();
         //handle input
         KeyPressed keypressed = get_keypressed();
 
@@ -210,6 +217,10 @@ void test_galaxian_kill_aliens()
             }
         }
         //run stuff
+        for (int i = 0; i < NUM_STARS; ++i)
+        {
+            star[i].run();
+        }
         for (int i = 0; i < LASER_SIZE; ++i)
         {
             laser[i].run();
@@ -238,8 +249,8 @@ void test_galaxian_kill_aliens()
                             while (explosion[k].isAlive())
                                 ++k;
 
-                            explosion[k].set(alien[j]->rect().x, 
-                                             alien[j]->rect().y);
+                            explosion[k].set(alien[j]->rect().x + alien[j]->rect().w / 2,
+                                             alien[j]->rect().y + alien[j]->rect().h / 2);
                             alien[j]->isAlive() = false;
                             laser[i].isAlive() = false;
                         }
@@ -259,15 +270,16 @@ void test_galaxian_kill_aliens()
                     while (explosion[k].isAlive())
                         ++k;
 
-                    explosion[k].set(alien[i]->rect().x, 
-                                     alien[i]->rect().y);
+                    explosion[k].set(alien[i]->rect().x + alien[i]->rect().w / 2, 
+                                     alien[i]->rect().y + alien[i]->rect().h / 2);
 
                     k = 0;
                     while (explosion[k].isAlive())
                         ++k;
 
-                    explosion[k].set(ship.rect().x, 
-                                     ship.rect().y);
+                    //explosion for player ship
+                    explosion[k].set(ship.rect().x + ship.rect().w / 2, 
+                                     ship.rect().y + ship.rect().h / 2);
 
                     alien[i]->isAlive() = false;
                     ship.isAlive() = false;
@@ -278,6 +290,10 @@ void test_galaxian_kill_aliens()
         surface.lock();
         surface.fill(BLACK);
         //draw stuff
+        for (int i = 0; i < NUM_STARS; ++i)
+        {
+            star[i].draw(surface);
+        }
         ship.draw(surface);
         for (int i = 0; i < LASER_SIZE; ++i)
         {
@@ -294,7 +310,9 @@ void test_galaxian_kill_aliens()
         surface.unlock();
         surface.flip();
 
-        delay(20);
+        int frame_end = getTicks();
+        int delaytime = FRAME_RATE - frame_end + frame_start;
+        if (delaytime > 0) delay(delaytime);
         
     }
 

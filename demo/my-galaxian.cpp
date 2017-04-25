@@ -166,6 +166,10 @@ void test_galaxian_kill_aliens()
     PlayerShip ship(0,H-32);
     Laser laser[LASER_SIZE];
 
+    //init explosion
+    const int NUM_EXPLOSIONS = 100;
+    Explosion explosion[NUM_EXPLOSIONS];
+
     //game loop
     while (1)
     {
@@ -206,6 +210,10 @@ void test_galaxian_kill_aliens()
         {
             alien[i]->run();
         }
+        for (int i = 0; i < NUM_EXPLOSIONS; ++i)
+        {
+            explosion[i].run();
+        }
 
         //check collision of lasers vs aliens
         for (int i = 0; i < LASER_SIZE; ++i)
@@ -218,6 +226,12 @@ void test_galaxian_kill_aliens()
                     {
                         if (isCollision(laser[i].rect(), alien[j]->rect()))
                         {
+                            int k = 0;
+                            while (explosion[k].isAlive())
+                                ++k;
+
+                            explosion[k].set(alien[j]->rect().x, 
+                                             alien[j]->rect().y);
                             alien[j]->isAlive() = false;
                             laser[i].isAlive() = false;
                         }
@@ -233,6 +247,20 @@ void test_galaxian_kill_aliens()
             {
                 if (isCollision(alien[i]->rect(), ship.rect()) && ship.isAlive())
                 {
+                    int k = 0;
+                    while (explosion[k].isAlive())
+                        ++k;
+
+                    explosion[k].set(alien[i]->rect().x, 
+                                     alien[i]->rect().y);
+
+                    k = 0;
+                    while (explosion[k].isAlive())
+                        ++k;
+
+                    explosion[k].set(ship.rect().x, 
+                                     ship.rect().y);
+
                     alien[i]->isAlive() = false;
                     ship.isAlive() = false;
                 }
@@ -250,6 +278,10 @@ void test_galaxian_kill_aliens()
         for (int i = 0; i < NUM_AQUA; ++i)
         {
             alien[i]->draw(surface);
+        }
+        for (int i = 0; i < NUM_EXPLOSIONS; ++i)
+        {
+            explosion[i].draw(surface);
         }
         surface.unlock();
         surface.flip();
@@ -533,6 +565,43 @@ bool & Laser::isAlive()
 Rect & Laser::rect()
 {
     return rect_;
+}
+
+Explosion::Explosion()
+    : isAlive_(false),
+    x_(0),
+    y_(0),
+    r_(1),
+    dr_(1)
+{ }
+
+void Explosion::set(int x, int y)
+{
+    x_ = x;
+    y_ = y;
+    r_ = 1;
+    isAlive_ = true;
+}
+void Explosion::run()
+{
+    if (isAlive_)
+    {
+        r_ += dr_;
+        if (r_ > 30) isAlive_ = false;
+    }
+}
+void Explosion::draw(Surface & surface) const
+{
+    if (isAlive_)
+    {
+        surface.put_circle(x_, y_, r_, RED);
+        surface.put_circle(x_, y_, r_ / 1.2, YELLOW);
+        surface.put_circle(x_, y_, r_ / 2, WHITE);
+    }
+}
+bool & Explosion::isAlive()
+{
+    return isAlive_;
 }
 
 Star::Star(int x, int y)

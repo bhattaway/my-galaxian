@@ -123,6 +123,23 @@ private:
     int dy_;
 };
 
+class Explosion
+{
+public:
+    Explosion();
+    void set(int x, int y);
+    void run();
+    void draw(Surface &) const;
+    bool & isAlive();
+
+private:
+    bool isAlive_;
+    int x_;
+    int y_;
+    int r_;
+    int dr_;
+};
+
 class Star
 {
 public:

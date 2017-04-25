@@ -354,6 +354,32 @@ void test_galaxian_starfield()
     }
 }
 
+void test_galaxian_fleet()
+{
+    Surface surface(W,H);
+    Event event;
+    Fleet fleet;
+
+    fleet.init();
+
+    while (1)
+    {
+        if (event.poll() && event.type() == QUIT) break;
+
+        fleet.run();
+
+        surface.lock();
+        surface.fill(BLACK);
+        fleet.draw(surface);
+        surface.unlock();
+        surface.flip();
+
+        delay(30);
+    }
+
+    fleet.delete_alien();
+}
+
 bool isCollision(const Rect & r0, const Rect & r1)
 {
     int r0xp = r0.x + r0.w; //stands for r0.x(prime)
@@ -381,17 +407,60 @@ bool isCollision(const Rect & r0, const Rect & r1)
     //return (x_overlap && y_overlap);
 }
 
-/*
-Alien::Alien(int x, int y)
-    : state_(0),
-    dx_(3),
-    dy_(0)
+void Fleet::init()
 {
-    rect_ = image_.getRect();
-    rect_.x = x;
-    rect_.y = y;
+    for (int col = 0; col < 10; ++col)
+    {
+        alien[0][col] = new YellowAlien(32 * col, 0 * 32);
+    }
+    for (int col = 0; col < 10; ++col)
+    {
+        alien[1][col] = new RedAlien(32 * col, 1 * 32);
+    }
+    for (int col = 0; col < 10; ++col)
+    {
+        alien[2][col] = new PurpleAlien(32 * col, 2 * 32);
+    }
+    for (int row = 3; row < 6; ++row)
+    {
+        for (int col = 0; col < 10; ++col)
+        {
+            alien[row][col] = new AquaAlien(32 * col, 32 * row);
+        }
+    }
 }
-*/
+
+void Fleet::delete_alien()
+{
+    for (int row = 0; row < 6; ++row)
+    {
+        for (int col = 0; col < 10; ++col)
+        {
+            delete alien[row][col];
+        }
+    }
+}
+void Fleet::run()
+{
+    for (int row = 0; row < 6; ++row)
+    {
+        for (int col = 0; col < 10; ++col)
+        {
+            alien[row][col]->run();
+        }
+    }
+}
+void Fleet::draw(Surface & surface) const
+{
+    for (int row = 0; row < 6; ++row)
+    {
+        for (int col = 0; col < 10; ++col)
+        {
+            alien[row][col]->draw(surface);
+        }
+    }
+}
+
 
 Image AquaAlien::image_("images/galaxian/GalaxianAquaAlien.gif");
 
@@ -426,7 +495,7 @@ void AquaAlien::run()
                     dx_ = -dx_;
                 }
 
-                if (rand() % 100 == 0) state_ = 1;
+                //if (rand() % 100 == 0) state_ = 1;
                 break;
             case 1: //attack
                 dy_ = 3;
@@ -487,7 +556,7 @@ void RedAlien::run()
                     dx_ = -dx_;
                 }
 
-                if (rand() % 100 == 0) state_ = 1;
+                //if (rand() % 100 == 0) state_ = 1;
                 break;
             case 1: //attack
                 dy_ = 3;
@@ -548,7 +617,7 @@ void PurpleAlien::run()
                     dx_ = -dx_;
                 }
 
-                if (rand() % 100 == 0) state_ = 1;
+                //if (rand() % 100 == 0) state_ = 1;
                 break;
             case 1: //attack
                 dy_ = 3;
@@ -609,7 +678,7 @@ void YellowAlien::run()
                     dx_ = -dx_;
                 }
 
-                if (rand() % 100 == 0) state_ = 1;
+                //if (rand() % 100 == 0) state_ = 1;
                 break;
             case 1: //attack
                 dy_ = 3;

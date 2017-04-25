@@ -22,8 +22,22 @@ void test_galaxian_alien();
 void test_galaxian_player_ship();
 void test_galaxian_kill_aliens();
 void test_galaxian_starfield();
+void test_galaxian_fleet();
 
 bool isCollision(const Rect &, const Rect &);
+
+class Alien;
+
+class Fleet
+{
+public:
+    void init();
+    void delete_alien();
+    void run();
+    void draw(Surface &) const;
+    Alien * alien[6][10];
+private:
+};
 
 class Alien
 {

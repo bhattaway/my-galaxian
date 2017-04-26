@@ -53,6 +53,7 @@ public:
     int fleet_state;
     Rect rect_;
     int dx_;
+    int time_of_fleet_death_;
 private:
 };
 

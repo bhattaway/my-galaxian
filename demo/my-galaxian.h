@@ -69,21 +69,21 @@ public:
 
     virtual void run() = 0;
     virtual void draw(Surface &) const = 0;
-    virtual bool & isAlive() = 0;
-    virtual Rect & rect() = 0;
-    virtual int & state() = 0;
+    Rect & rect();
+    int & state();
+    bool & isAlive();
+    int row();
+    int col();
 
 protected:
     int row_;
     int col_;
-/*
-//protected:
     Rect rect_;
 
     int state_;
+    bool isAlive_;
     int dx_;
     int dy_;
-    */
 };
 
 class AquaAlien : public Alien
@@ -94,18 +94,9 @@ public:
 
     void run();
     void draw(Surface &) const;
-    bool & isAlive();
-    Rect & rect();
-    int & state();
 
 private:
-    Rect rect_;
     static Image image_;
-
-    int state_;
-    bool isAlive_;
-    int dx_;
-    int dy_;
 };
 
 class RedAlien : public Alien
@@ -115,18 +106,9 @@ public:
 
     void run();
     void draw(Surface &) const;
-    bool & isAlive();
-    Rect & rect();
-    int & state();
 
 private:
-    Rect rect_;
     static Image image_;
-
-    int state_;
-    bool isAlive_;
-    int dx_;
-    int dy_;
 };
 
 class PurpleAlien : public Alien
@@ -136,18 +118,9 @@ public:
 
     void run();
     void draw(Surface &) const;
-    bool & isAlive();
-    Rect & rect();
-    int & state();
 
 private:
-    Rect rect_;
     static Image image_;
-
-    int state_;
-    bool isAlive_;
-    int dx_;
-    int dy_;
 };
 class YellowAlien : public Alien
 {
@@ -156,18 +129,9 @@ public:
 
     void run();
     void draw(Surface &) const;
-    bool & isAlive();
-    Rect & rect();
-    int & state();
 
 private:
-    Rect rect_;
     static Image image_;
-
-    int state_;
-    bool isAlive_;
-    int dx_;
-    int dy_;
 };
 
 class PlayerShip

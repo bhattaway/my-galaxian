@@ -696,20 +696,40 @@ Rect & Fleet::rect()
     return rect_;
 }
 
+Rect & Alien::rect()
+{
+    return rect_;
+}
+int & Alien::state()
+{
+    return state_;
+}
+bool & Alien::isAlive()
+{
+    return isAlive_;
+}
+int Alien::row()
+{
+    return row_;
+}
+int Alien::col()
+{
+    return col_;
+}
 
 Image AquaAlien::image_("images/galaxian/GalaxianAquaAlien.gif");
 
 AquaAlien::AquaAlien(int x, int y, int row, int col)
-      : state_(0),
-      isAlive_(true),
-      dx_(3),
-      dy_(0)
 { 
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
     row_ = row;
     col_ = col;
+    state_ = 0;
+    isAlive_ = true;
+    dx_ = 3;
+    dy_ = 0;
 }
 
 void AquaAlien::run()
@@ -764,30 +784,18 @@ void AquaAlien::draw(Surface & surface) const
 {
     if (isAlive_) surface.put_image(image_, rect_);
 }
-bool & AquaAlien::isAlive()
-{
-    return isAlive_;
-}
-Rect & AquaAlien::rect()
-{
-    return rect_;
-}
-int & AquaAlien::state()
-{
-    return state_;
-}
 
 Image RedAlien::image_("images/galaxian/GalaxianRedAlien.gif");
 
 RedAlien::RedAlien(int x, int y)
-      : state_(0),
-      isAlive_(true),
-      dx_(3),
-      dy_(0)
 { 
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
+    state_ = 0;
+    isAlive_ = true;
+    dx_ = 3;
+    dy_ = 0;
 
 }
 
@@ -843,31 +851,18 @@ void RedAlien::draw(Surface & surface) const
 {
     if (isAlive_) surface.put_image(image_, rect_);
 }
-bool & RedAlien::isAlive()
-{
-    return isAlive_;
-}
-Rect & RedAlien::rect()
-{
-    return rect_;
-}
-int & RedAlien::state()
-{
-    return state_;
-}
 
 Image PurpleAlien::image_("images/galaxian/GalaxianPurpleAlien.gif");
 
 PurpleAlien::PurpleAlien(int x, int y)
-      : state_(0),
-      isAlive_(true),
-      dx_(3),
-      dy_(0)
 { 
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
-
+    state_ = 0;
+    isAlive_ = true;
+    dx_ = 3;
+    dy_ = 0;
 }
 
 void PurpleAlien::run()
@@ -922,30 +917,18 @@ void PurpleAlien::draw(Surface & surface) const
 {
     if (isAlive_) surface.put_image(image_, rect_);
 }
-bool & PurpleAlien::isAlive()
-{
-    return isAlive_;
-}
-Rect & PurpleAlien::rect()
-{
-    return rect_;
-}
-int & PurpleAlien::state()
-{
-    return state_;
-}
 
 Image YellowAlien::image_("images/galaxian/GalaxianFlagship.gif");
 
 YellowAlien::YellowAlien(int x, int y)
-      : state_(0),
-      isAlive_(true),
-      dx_(3),
-      dy_(0)
 { 
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
+    state_ = 0;
+    isAlive_ = true;
+    dx_ = 3;
+    dy_ = 0;
 
 }
 
@@ -1000,18 +983,6 @@ void YellowAlien::run()
 void YellowAlien::draw(Surface & surface) const
 {
     if (isAlive_) surface.put_image(image_, rect_);
-}
-bool & YellowAlien::isAlive()
-{
-    return isAlive_;
-}
-Rect & YellowAlien::rect()
-{
-    return rect_;
-}
-int & YellowAlien::state()
-{
-    return state_;
 }
 
 

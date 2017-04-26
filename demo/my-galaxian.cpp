@@ -562,25 +562,26 @@ bool isCollision(const Rect & r0, const Rect & r1)
 }
 
 int Fleet::fleet_state = 0;
+Rect Fleet::rect_;
 void Fleet::init()
 {
     for (int col = 0; col < NUM_COLS; ++col)
     {
-        alien[0][col] = new YellowAlien(32 * col, 1 * 32);
+        alien[0][col] = new YellowAlien(32 * col, 1 * 32, 0, col);
     }
     for (int col = 0; col < NUM_COLS; ++col)
     {
-        alien[1][col] = new RedAlien(32 * col, 2 * 32);
+        alien[1][col] = new RedAlien(32 * col, 2 * 32, 1, col);
     }
     for (int col = 0; col < NUM_COLS; ++col)
     {
-        alien[2][col] = new PurpleAlien(32 * col, 3 * 32);
+        alien[2][col] = new PurpleAlien(32 * col, 3 * 32, 2, col);
     }
     for (int row = 3; row < NUM_ROWS; ++row)
     {
         for (int col = 0; col < NUM_COLS; ++col)
         {
-            alien[row][col] = new AquaAlien(32 * col, 32 * row + 32);
+            alien[row][col] = new AquaAlien(32 * col, 32 * row + 32, row, col);
         }
     }
     alien[0][0]->isAlive() = false;
@@ -603,7 +604,7 @@ void Fleet::init()
     rect_.w = alien[0][0]->rect().w * NUM_COLS;
     rect_.h = alien[0][0]->rect().h * NUM_ROWS;
     rect_.x = 10;
-    dx_ = 3;
+    dx_ = 2;
     recalculate_num_aliens_alive();
 
     time_of_fleet_death_ = 0;
@@ -629,7 +630,7 @@ void Fleet::run()
             switch_state(0);
             dx_ = -dx_;
         }
-        if (rect_.x + rect_.w > W - 10)
+        if (rect_.x + rect_.w > W)
         {
             switch_state(1);
             dx_ = -dx_;
@@ -799,8 +800,8 @@ Alien::Alien(int x, int y, int row, int col)
     col_(col),
     state_(0),
     isAlive_(true),
-    dx_(3),
-    dy_(0)
+    dx_(2),
+    dy_(4)
 {
     rect_.x = x;
     rect_.y = y;
@@ -849,6 +850,10 @@ void AquaAlien::run()
         {
             case 0: //passive in fleet, moving right
                 rect_.x += dx_;
+                if (rect_.y < row_ * 32 + 32)
+                {
+                    rect_.y += dy_;
+                }
                 if (rect_.x < 0)
                 {
                     rect_.x = 0;
@@ -863,6 +868,10 @@ void AquaAlien::run()
                 //if (rand() % 100 == 0) state_ = 1;
                 break;
             case 1: //passive in fleet, moving left
+                if (rect_.y < row_ * 32 + 32)
+                {
+                    rect_.y += dy_;
+                }
                 rect_.x -= dx_;
 
                 if (rect_.x < 0)
@@ -877,10 +886,10 @@ void AquaAlien::run()
                 }
                 break;
             case 2: //attack
-                dy_ = 3;
                 rect_.y += dy_;
                 if (rect_.y > H)
                 {
+                    rect_.x = 32 * col_ + Fleet::rect_.x - 10;
                     rect_.y = 32;
                     state_ = Fleet::fleet_state;
                 }
@@ -913,6 +922,10 @@ void RedAlien::run()
         {
             case 0: //passive in fleet, moving right
                 rect_.x += dx_;
+                if (rect_.y < row_ * 32 + 32)
+                {
+                    rect_.y += dy_;
+                }
                 if (rect_.x < 0)
                 {
                     rect_.x = 0;
@@ -928,6 +941,10 @@ void RedAlien::run()
                 break;
             case 1: //passive in fleet, moving left
                 rect_.x -= dx_;
+                if (rect_.y < row_ * 32 + 32)
+                {
+                    rect_.y += dy_;
+                }
 
                 if (rect_.x < 0)
                 {
@@ -941,10 +958,10 @@ void RedAlien::run()
                 }
                 break;
             case 2: //attack
-                dy_ = 3;
                 rect_.y += dy_;
                 if (rect_.y > H)
                 {
+                    rect_.x = 32 * col_ + Fleet::rect_.x - 10;
                     rect_.y = 32;
                     state_ = Fleet::fleet_state;
                 }
@@ -977,6 +994,10 @@ void PurpleAlien::run()
         {
             case 0: //passive in fleet, moving right
                 rect_.x += dx_;
+                if (rect_.y < row_ * 32 + 32)
+                {
+                    rect_.y += dy_;
+                }
                 if (rect_.x < 0)
                 {
                     rect_.x = 0;
@@ -992,6 +1013,10 @@ void PurpleAlien::run()
                 break;
             case 1: //passive in fleet, moving left
                 rect_.x -= dx_;
+                if (rect_.y < row_ * 32 + 32)
+                {
+                    rect_.y += dy_;
+                }
 
                 if (rect_.x < 0)
                 {
@@ -1009,6 +1034,7 @@ void PurpleAlien::run()
                 rect_.y += dy_;
                 if (rect_.y > H)
                 {
+                    rect_.x = 32 * col_ + Fleet::rect_.x - 10;
                     rect_.y = 32;
                     state_ = Fleet::fleet_state;
                 }
@@ -1041,6 +1067,10 @@ void YellowAlien::run()
         {
             case 0: //passive in fleet, moving right
                 rect_.x += dx_;
+                if (rect_.y < row_ * 32 + 32)
+                {
+                    rect_.y += dy_;
+                }
                 if (rect_.x < 0)
                 {
                     rect_.x = 0;
@@ -1056,6 +1086,10 @@ void YellowAlien::run()
                 break;
             case 1: //passive in fleet, moving left
                 rect_.x -= dx_;
+                if (rect_.y < row_ * 32 + 32)
+                {
+                    rect_.y += dy_;
+                }
 
                 if (rect_.x < 0)
                 {
@@ -1069,10 +1103,10 @@ void YellowAlien::run()
                 }
                 break;
             case 2: //attack
-                dy_ = 3;
                 rect_.y += dy_;
                 if (rect_.y > H)
                 {
+                    rect_.x = 32 * col_ + Fleet::rect_.x - 10;
                     rect_.y = 32;
                     state_ = Fleet::fleet_state;
                 }

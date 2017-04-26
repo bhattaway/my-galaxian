@@ -377,6 +377,8 @@ void test_galaxian_fleet()
 
     const int FRAME_RATE = 1000 / 30;
 
+    GameStats gamestats;
+
     //game loop
     while (1)
     {
@@ -429,11 +431,12 @@ void test_galaxian_fleet()
         //handle collisions: lasers vs aliens
         fleet.do_collision(laser, LASER_SIZE);
         //collisions: aliens vs playership
-        fleet.do_collision(ship);
+        fleet.do_collision(ship, gamestats);
 
         surface.lock();
         surface.fill(BLACK);
         //draw stuff
+        gamestats.draw(surface);
         for (int i = 0; i < NUM_STARS; ++i)
         {
             star[i].draw(surface);
@@ -641,7 +644,7 @@ void Fleet::do_collision(Laser laser[], int laser_size)
         }
     }
 }
-void Fleet::do_collision(PlayerShip & ship)
+void Fleet::do_collision(PlayerShip & ship, GameStats & gamestats)
 {
     if (num_aliens_alive != 0)
     {
@@ -673,7 +676,10 @@ void Fleet::do_collision(PlayerShip & ship)
                                      */
 
                     alien[row][col]->isAlive() = false;
+                    gamestats.score_ += alien[row][col]->score();
+
                     ship.isAlive() = false;
+                    --gamestats.num_lives_;
                     recalculate_num_aliens_alive();
                 }
             }
@@ -733,13 +739,17 @@ bool & Alien::isAlive()
 {
     return isAlive_;
 }
-int Alien::row()
+int Alien::row() const
 {
     return row_;
 }
-int Alien::col()
+int Alien::col() const
 {
     return col_;
+}
+int Alien::score() const
+{
+    return score_;
 }
 
 Image AquaAlien::image_("images/galaxian/GalaxianAquaAlien.gif");
@@ -750,6 +760,7 @@ AquaAlien::AquaAlien(int x, int y, int row, int col)
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
+    score_ = 30;
 }
 
 void AquaAlien::run()
@@ -813,6 +824,7 @@ RedAlien::RedAlien(int x, int y, int row, int col)
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
+    score_ = 50;
 }
 
 void RedAlien::run()
@@ -876,6 +888,7 @@ PurpleAlien::PurpleAlien(int x, int y, int row, int col)
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
+    score_ = 40;
 }
 
 void PurpleAlien::run()
@@ -939,6 +952,7 @@ YellowAlien::YellowAlien(int x, int y, int row, int col)
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
+    score_ = 60;
 }
 
 void YellowAlien::run()
@@ -1138,3 +1152,22 @@ void Star::draw(Surface & surface) const
     surface.put_rect(rect_, color_);
 }
 
+Image GameStats::ship_image_("images/galaxian/GalaxianGalaxip.gif");
+GameStats::GameStats()
+    : num_lives_(3),
+    score_(0),
+    current_level_(1)
+{
+    ship_rect_ = ship_image_.getRect();
+    ship_rect_.x = 0;
+    ship_rect_.y = H - ship_rect_.h;
+}
+void GameStats::draw(Surface & surface)
+{
+    for (int i = 0; i < num_lives_ - 1; ++i)
+    {
+        surface.put_image(ship_image_, ship_rect_);
+        ship_rect_.x += ship_rect_.w;
+    }
+    ship_rect_.x = 0;
+}

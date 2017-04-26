@@ -680,7 +680,7 @@ void test_sound()
 	{
 		if (event.poll() && event.type() == QUIT) break;
 
-		if (rand() < 100) sound.play();		// play sound randomly
+		if (rand() % 100 == 0) sound.play();		// play sound randomly
 		delay(10);
 	}
 }

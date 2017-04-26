@@ -38,6 +38,7 @@ bool isCollision(const Rect &, const Rect &);
 class Alien;
 class Laser;
 class PlayerShip;
+class GameStats;
 
 class Fleet
 {
@@ -47,7 +48,7 @@ public:
     void run();
     void draw(Surface &) const;
     void do_collision(Laser [], int);
-    void do_collision(PlayerShip &);
+    void do_collision(PlayerShip &, GameStats &);
     void recalculate_num_aliens_alive();
     void switch_state(int);
     Rect & rect();
@@ -73,8 +74,9 @@ public:
     Rect & rect();
     int & state();
     bool & isAlive();
-    int row();
-    int col();
+    int row() const;
+    int col() const;
+    int score() const;
 
 protected:
     int row_;
@@ -85,6 +87,7 @@ protected:
     bool isAlive_;
     int dx_;
     int dy_;
+    int score_;
 };
 
 class AquaAlien : public Alien
@@ -206,6 +209,21 @@ private:
     int dx_;
     int dy_;
     int dcolor_;
+};
+
+class GameStats
+{
+public:
+    GameStats();
+
+    void draw(Surface &);
+
+    int num_lives_;
+    int score_;
+    int current_level_;
+    static Image ship_image_;
+    Rect ship_rect_;
+private:
 };
 
 #endif

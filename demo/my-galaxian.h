@@ -44,7 +44,15 @@ public:
     void draw(Surface &) const;
     void do_collision(Laser [], int);
     void do_collision(PlayerShip &);
+    void recalculate_num_aliens_alive();
+    void switch_state(int);
+    Rect & rect();
+
     Alien * alien[NUM_ROWS][NUM_COLS];
+    int num_aliens_alive;
+    int fleet_state;
+    Rect rect_;
+    int dx_;
 private:
 };
 

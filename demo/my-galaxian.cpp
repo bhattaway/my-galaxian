@@ -488,32 +488,39 @@ bool isCollision(const Rect & r0, const Rect & r1)
 
 void Fleet::init()
 {
-    for (int col = 0; col < 10; ++col)
+    for (int col = 0; col < NUM_COLS; ++col)
     {
         alien[0][col] = new YellowAlien(32 * col, 0 * 32);
     }
-    for (int col = 0; col < 10; ++col)
+    for (int col = 0; col < NUM_COLS; ++col)
     {
         alien[1][col] = new RedAlien(32 * col, 1 * 32);
     }
-    for (int col = 0; col < 10; ++col)
+    for (int col = 0; col < NUM_COLS; ++col)
     {
         alien[2][col] = new PurpleAlien(32 * col, 2 * 32);
     }
-    for (int row = 3; row < 6; ++row)
+    for (int row = 3; row < NUM_ROWS; ++row)
     {
-        for (int col = 0; col < 10; ++col)
+        for (int col = 0; col < NUM_COLS; ++col)
         {
             alien[row][col] = new AquaAlien(32 * col, 32 * row);
         }
     }
+
+    switch_state(0);
+
+    rect_.w = alien[0][0]->rect().w * NUM_COLS;
+    rect_.h = alien[0][0]->rect().h * NUM_ROWS;
+    rect_.x = 10;
+    dx_ = 3;
 }
 
 void Fleet::delete_alien()
 {
-    for (int row = 0; row < 6; ++row)
+    for (int row = 0; row < NUM_ROWS; ++row)
     {
-        for (int col = 0; col < 10; ++col)
+        for (int col = 0; col < NUM_COLS; ++col)
         {
             delete alien[row][col];
         }
@@ -521,39 +528,32 @@ void Fleet::delete_alien()
 }
 void Fleet::run()
 {
-    if (alien[0][0]->rect().x < 10)
+    if (rect_.x < 10)
     {
-        for (int row = 0; row < 6; ++row)
-        {
-            for (int col = 0; col < 10; ++col)
-            {
-                alien[row][col]->state() = 0;
-            }
-        }
+        switch_state(0);
+        dx_ = -dx_;
     }
-    if (alien[0][9]->rect().x + 32 > W - 10)
+    if (rect_.x + rect_.w > W - 10)
     {
-        for (int row = 0; row < 6; ++row)
-        {
-            for (int col = 0; col < 10; ++col)
-            {
-                alien[row][col]->state() = 1;
-            }
-        }
+        switch_state(1);
+        dx_ = -dx_;
     }
-    for (int row = 0; row < 6; ++row)
+    for (int row = 0; row < NUM_ROWS; ++row)
     {
-        for (int col = 0; col < 10; ++col)
+        for (int col = 0; col < NUM_COLS; ++col)
         {
             alien[row][col]->run();
         }
     }
+
+    rect_.x += dx_;
+    //std::cout << rect_ << std::endl;
 }
 void Fleet::draw(Surface & surface) const
 {
-    for (int row = 0; row < 6; ++row)
+    for (int row = 0; row < NUM_ROWS; ++row)
     {
-        for (int col = 0; col < 10; ++col)
+        for (int col = 0; col < NUM_COLS; ++col)
         {
             alien[row][col]->draw(surface);
         }
@@ -566,9 +566,9 @@ void Fleet::do_collision(Laser laser[], int laser_size)
     {
         if (laser[i].isAlive())
         {
-            for (int row = 0; row < 6; ++row)
+            for (int row = 0; row < NUM_ROWS; ++row)
             {
-                for (int col = 0; col < 10; ++col)
+                for (int col = 0; col < NUM_COLS; ++col)
                 {
                     if (alien[row][col]->isAlive() 
                       && isCollision(laser[i].rect(), alien[row][col]->rect()))
@@ -583,6 +583,7 @@ void Fleet::do_collision(Laser laser[], int laser_size)
                                          */
                         alien[row][col]->isAlive() = false;
                         laser[i].isAlive() = false;
+                        recalculate_num_aliens_alive();
                     }
                 }
             }
@@ -599,7 +600,7 @@ void Fleet::do_collision(PlayerShip & ship)
             if (alien[row][col]->isAlive()
                && alien[row][col]->state() == 2
                && isCollision(alien[row][col]->rect(), ship.rect())
-               && ship.isAlive)
+               && ship.isAlive())
             {
                 /*
                 int k = 0;
@@ -618,11 +619,41 @@ void Fleet::do_collision(PlayerShip & ship)
                                  ship.rect().y + ship.rect().h / 2);
                                  */
 
-                alien[i]->isAlive() = false;
+                alien[row][col]->isAlive() = false;
                 ship.isAlive() = false;
+                recalculate_num_aliens_alive();
             }
         }
     }
+}
+void Fleet::recalculate_num_aliens_alive()
+{
+    num_aliens_alive = 0;
+    for (int row = 0; row < NUM_ROWS; ++row)
+    {
+        for (int col = 0; col < NUM_COLS; ++col)
+        {
+            if (alien[row][col]->isAlive()) ++num_aliens_alive;
+        }
+    }
+}
+void Fleet::switch_state(int new_state)
+{
+    for (int row = 0; row < NUM_ROWS; ++row)
+    {
+        for (int col = 0; col < NUM_COLS; ++col)
+        {
+            if (alien[row][col]->state() != 2) //2 is attack state
+            {
+                alien[row][col]->state() = new_state;
+            }
+        }
+    }
+    fleet_state = new_state;
+}
+Rect & Fleet::rect()
+{
+    return rect_;
 }
 
 

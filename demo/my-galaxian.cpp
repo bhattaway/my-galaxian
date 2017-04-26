@@ -507,6 +507,20 @@ void Fleet::init()
             alien[row][col] = new AquaAlien(32 * col, 32 * row);
         }
     }
+    alien[0][0]->isAlive() = false;
+    alien[0][1]->isAlive() = false;
+    alien[0][2]->isAlive() = false;
+    alien[0][4]->isAlive() = false;
+    alien[0][5]->isAlive() = false;
+    alien[0][7]->isAlive() = false;
+    alien[0][8]->isAlive() = false;
+    alien[0][9]->isAlive() = false;
+    alien[1][0]->isAlive() = false;
+    alien[1][1]->isAlive() = false;
+    alien[1][8]->isAlive() = false;
+    alien[1][9]->isAlive() = false;
+    alien[2][0]->isAlive() = false;
+    alien[2][9]->isAlive() = false;
 
     switch_state(0);
 

@@ -358,14 +358,15 @@ void test_galaxian_fleet()
 {
     Surface surface(W,H);
     Event event;
+
     Fleet fleet;
 
     //init fleet
     fleet.init();
     //init lasers and ship
     const int LASER_SIZE = 100;
-    PlayerShip ship(0,H-32);
-    ship.init();
+    PlayerShip ship(0, 0);
+    //ship.init();
     Laser laser[LASER_SIZE];
 
     //init explosion
@@ -407,7 +408,7 @@ void test_galaxian_fleet()
 
         if (keypressed[SPACE])
         {
-            gamestats.game_state_ = 1; //game state
+            gamestats.game_state_ = 1; //init state
         }
         for (int i = 0; i < NUM_STARS; ++i)
         {
@@ -493,9 +494,10 @@ void test_galaxian_fleet()
         }
 
         //handle collisions: lasers vs aliens
-        fleet.do_collision(laser, LASER_SIZE, gamestats);
+        fleet.do_collision(laser, LASER_SIZE, 
+                explosion, NUM_EXPLOSIONS, gamestats);
         //collisions: aliens vs playership
-        fleet.do_collision(ship, gamestats);
+        fleet.do_collision(ship, explosion, NUM_EXPLOSIONS, gamestats);
 
         surface.lock();
         surface.fill(BLACK);
@@ -563,21 +565,21 @@ void Fleet::init()
 {
     for (int col = 0; col < NUM_COLS; ++col)
     {
-        alien[0][col] = new YellowAlien(32 * col, 0 * 32);
+        alien[0][col] = new YellowAlien(32 * col, 1 * 32);
     }
     for (int col = 0; col < NUM_COLS; ++col)
     {
-        alien[1][col] = new RedAlien(32 * col, 1 * 32);
+        alien[1][col] = new RedAlien(32 * col, 2 * 32);
     }
     for (int col = 0; col < NUM_COLS; ++col)
     {
-        alien[2][col] = new PurpleAlien(32 * col, 2 * 32);
+        alien[2][col] = new PurpleAlien(32 * col, 3 * 32);
     }
     for (int row = 3; row < NUM_ROWS; ++row)
     {
         for (int col = 0; col < NUM_COLS; ++col)
         {
-            alien[row][col] = new AquaAlien(32 * col, 32 * row);
+            alien[row][col] = new AquaAlien(32 * col, 32 * row + 32);
         }
     }
     alien[0][0]->isAlive() = false;
@@ -680,7 +682,8 @@ void Fleet::draw(Surface & surface) const
         }
     }
 }
-void Fleet::do_collision(Laser laser[], int laser_size, GameStats & gamestats)
+void Fleet::do_collision(Laser laser[], int laser_size, 
+        Explosion explosion [], int explosion_size, GameStats & gamestats)
 {
     if (num_aliens_alive != 0)
     {
@@ -696,14 +699,15 @@ void Fleet::do_collision(Laser laser[], int laser_size, GameStats & gamestats)
                         if (alien[row][col]->isAlive() 
                           && isCollision(laser[i].rect(), alien[row][col]->rect()))
                         {
-                            /*
                             int k = 0;
                             while (explosion[k].isAlive())
                                 ++k;
 
-                            explosion[k].set(alien[j]->rect().x + alien[j]->rect().w / 2,
-                                             alien[j]->rect().y + alien[j]->rect().h / 2);
-                                             */
+                            explosion[k].set(alien[row][col]->rect().x 
+                                    + alien[row][col]->rect().w / 2,
+                                    alien[row][col]->rect().y 
+                                    + alien[row][col]->rect().h / 2);
+
                             gamestats.score_ += alien[row][col]->score();
                             alien[row][col]->isAlive() = false;
                             laser[i].isAlive() = false;
@@ -715,7 +719,8 @@ void Fleet::do_collision(Laser laser[], int laser_size, GameStats & gamestats)
         }
     }
 }
-void Fleet::do_collision(PlayerShip & ship, GameStats & gamestats)
+void Fleet::do_collision(PlayerShip & ship, Explosion explosion[],
+       int explosion_size, GameStats & gamestats)
 {
     if (num_aliens_alive != 0)
     {
@@ -729,13 +734,14 @@ void Fleet::do_collision(PlayerShip & ship, GameStats & gamestats)
                    && isCollision(alien[row][col]->rect(), ship.rect())
                    && ship.isAlive())
                 {
-                    /*
                     int k = 0;
                     while (explosion[k].isAlive())
                         ++k;
 
-                    explosion[k].set(alien[i]->rect().x + alien[i]->rect().w / 2, 
-                                     alien[i]->rect().y + alien[i]->rect().h / 2);
+                    explosion[k].set(alien[row][col]->rect().x 
+                            + alien[row][col]->rect().w / 2, 
+                                     alien[row][col]->rect().y 
+                                     + alien[row][col]->rect().h / 2);
 
                     k = 0;
                     while (explosion[k].isAlive())
@@ -744,7 +750,7 @@ void Fleet::do_collision(PlayerShip & ship, GameStats & gamestats)
                     //explosion for player ship
                     explosion[k].set(ship.rect().x + ship.rect().w / 2, 
                                      ship.rect().y + ship.rect().h / 2);
-                                     */
+                                     
 
                     alien[row][col]->isAlive() = false;
                     gamestats.score_ += alien[row][col]->score();
@@ -1266,7 +1272,7 @@ void GameStats::init()
 }
 void GameStats::draw(Surface & surface)
 {
-    //draw lives in lower right
+    //draw lives in lower left
     for (int i = 0; i < num_lives_ - 1; ++i)
     {
         surface.put_image(ship_image_, ship_rect_);

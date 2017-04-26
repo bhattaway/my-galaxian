@@ -41,6 +41,7 @@ class Alien;
 class Laser;
 class PlayerShip;
 class GameStats;
+class Explosion;
 
 class Fleet
 {
@@ -49,8 +50,8 @@ public:
     void delete_alien();
     void run();
     void draw(Surface &) const;
-    void do_collision(Laser [], int, GameStats &);
-    void do_collision(PlayerShip &, GameStats &);
+    void do_collision(Laser [], int, Explosion [], int, GameStats &);
+    void do_collision(PlayerShip &, Explosion [], int, GameStats &);
     void recalculate_num_aliens_alive();
     void switch_state(int);
     Rect & rect();
@@ -146,7 +147,7 @@ private:
 class PlayerShip
 {
 public:
-    PlayerShip(int x = 0, int y = W - 100);
+    PlayerShip(int x = 0, int y = 0);
     void draw(Surface &) const;
     void moveRight();
     void moveLeft();

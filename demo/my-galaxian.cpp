@@ -561,6 +561,7 @@ bool isCollision(const Rect & r0, const Rect & r1)
     //return (x_overlap && y_overlap);
 }
 
+int Fleet::fleet_state = 0;
 void Fleet::init()
 {
     for (int col = 0; col < NUM_COLS; ++col)
@@ -880,8 +881,8 @@ void AquaAlien::run()
                 rect_.y += dy_;
                 if (rect_.y > H)
                 {
-                    rect_.y = 0;
-                    state_ = 0;
+                    rect_.y = 32;
+                    state_ = Fleet::fleet_state;
                 }
                 break;
         }
@@ -944,8 +945,8 @@ void RedAlien::run()
                 rect_.y += dy_;
                 if (rect_.y > H)
                 {
-                    rect_.y = 0;
-                    state_ = 0;
+                    rect_.y = 32;
+                    state_ = Fleet::fleet_state;
                 }
                 break;
         }
@@ -1008,8 +1009,8 @@ void PurpleAlien::run()
                 rect_.y += dy_;
                 if (rect_.y > H)
                 {
-                    rect_.y = 0;
-                    state_ = 0;
+                    rect_.y = 32;
+                    state_ = Fleet::fleet_state;
                 }
                 break;
         }
@@ -1072,8 +1073,8 @@ void YellowAlien::run()
                 rect_.y += dy_;
                 if (rect_.y > H)
                 {
-                    rect_.y = 0;
-                    state_ = 0;
+                    rect_.y = 32;
+                    state_ = Fleet::fleet_state;
                 }
                 break;
         }

@@ -58,7 +58,7 @@ public:
 
     Alien * alien[NUM_ROWS][NUM_COLS];
     int num_aliens_alive;
-    int fleet_state;
+    static int fleet_state;
     Rect rect_;
     int dx_;
     int time_of_fleet_death_;

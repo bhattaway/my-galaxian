@@ -65,7 +65,8 @@ private:
 class Alien
 {
 public:
-    //Alien(int x = 0, int y = 0);
+    Alien(int x = 0, int y = 0,
+            int row = 0, int col = 0);
 
     virtual void run() = 0;
     virtual void draw(Surface &) const = 0;
@@ -102,7 +103,8 @@ private:
 class RedAlien : public Alien
 {
 public:
-    RedAlien(int x = 0, int y = 0);
+    RedAlien(int x = 0, int y = 0,
+            int row = 0, int col = 0);
 
     void run();
     void draw(Surface &) const;
@@ -114,7 +116,8 @@ private:
 class PurpleAlien : public Alien
 {
 public:
-    PurpleAlien(int x = 0, int y = 0);
+    PurpleAlien(int x = 0, int y = 0,
+            int row = 0, int col = 0);
 
     void run();
     void draw(Surface &) const;
@@ -125,7 +128,8 @@ private:
 class YellowAlien : public Alien
 {
 public:
-    YellowAlien(int x = 0, int y = 0);
+    YellowAlien(int x = 0, int y = 0,
+            int row = 0, int col = 0);
 
     void run();
     void draw(Surface &) const;

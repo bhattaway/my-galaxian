@@ -696,6 +696,17 @@ Rect & Fleet::rect()
     return rect_;
 }
 
+Alien::Alien(int x, int y, int row, int col)
+    : row_(row),
+    col_(col),
+    state_(0),
+    isAlive_(true),
+    dx_(3),
+    dy_(0)
+{
+    rect_.x = x;
+    rect_.y = y;
+}
 Rect & Alien::rect()
 {
     return rect_;
@@ -720,16 +731,11 @@ int Alien::col()
 Image AquaAlien::image_("images/galaxian/GalaxianAquaAlien.gif");
 
 AquaAlien::AquaAlien(int x, int y, int row, int col)
+    : Alien(x, y, row, col)
 { 
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
-    row_ = row;
-    col_ = col;
-    state_ = 0;
-    isAlive_ = true;
-    dx_ = 3;
-    dy_ = 0;
 }
 
 void AquaAlien::run()
@@ -787,16 +793,12 @@ void AquaAlien::draw(Surface & surface) const
 
 Image RedAlien::image_("images/galaxian/GalaxianRedAlien.gif");
 
-RedAlien::RedAlien(int x, int y)
+RedAlien::RedAlien(int x, int y, int row, int col)
+    : Alien(x, y, row, col)
 { 
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
-    state_ = 0;
-    isAlive_ = true;
-    dx_ = 3;
-    dy_ = 0;
-
 }
 
 void RedAlien::run()
@@ -854,15 +856,12 @@ void RedAlien::draw(Surface & surface) const
 
 Image PurpleAlien::image_("images/galaxian/GalaxianPurpleAlien.gif");
 
-PurpleAlien::PurpleAlien(int x, int y)
+PurpleAlien::PurpleAlien(int x, int y, int row, int col)
+    : Alien(x, y, row, col)
 { 
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
-    state_ = 0;
-    isAlive_ = true;
-    dx_ = 3;
-    dy_ = 0;
 }
 
 void PurpleAlien::run()
@@ -920,16 +919,12 @@ void PurpleAlien::draw(Surface & surface) const
 
 Image YellowAlien::image_("images/galaxian/GalaxianFlagship.gif");
 
-YellowAlien::YellowAlien(int x, int y)
+YellowAlien::YellowAlien(int x, int y, int row, int col)
+    : Alien(x, y, row, col)
 { 
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
-    state_ = 0;
-    isAlive_ = true;
-    dx_ = 3;
-    dy_ = 0;
-
 }
 
 void YellowAlien::run()

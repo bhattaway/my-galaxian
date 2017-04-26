@@ -222,6 +222,7 @@ public:
     GameStats();
 
     void draw(Surface &);
+    void init();
 
     int num_lives_;
     int score_;

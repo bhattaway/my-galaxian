@@ -380,6 +380,18 @@ void test_galaxian_fleet()
 
     GameStats gamestats;
 
+    Font font1("fonts/FreeMono.ttf", 24);
+
+    Image title_screen(font1.render("WELCOME TO GALAXIAN", GREEN));
+    Rect title_screen_rect = title_screen.getRect();
+    title_screen_rect.x = W / 2;
+    title_screen_rect.y = H / 2;
+
+    Image game_over(font1.render("GAME OVER", RED));
+    Rect game_over_rect = game_over.getRect();
+    game_over_rect.x = W / 2;
+    game_over_rect.y = H / 2;
+
     //game loop
     while (1)
     {
@@ -389,6 +401,36 @@ void test_galaxian_fleet()
         //handle input
         KeyPressed keypressed = get_keypressed();
 
+        switch (gamestats.game_state_)
+        {
+    case 0:
+
+        if (keypressed[SPACE])
+        {
+            gamestats.game_state_ = 1; //game state
+        }
+        for (int i = 0; i < NUM_STARS; ++i)
+        {
+            star[i].run();
+        }
+        surface.lock();
+        surface.fill(BLACK);
+        surface.put_image(title_screen, title_screen_rect);
+        for (int i = 0; i < NUM_STARS; ++i)
+        {
+            star[i].draw(surface);
+        }
+        surface.unlock();
+        surface.flip();
+        break;
+    case 1: //init state
+        fleet.init();
+        ship.init();
+        gamestats.init();
+        gamestats.game_state_ = 2;
+        break;
+
+    case 2: //game loop
         if (ship.isAlive())
         {
             if (keypressed[LEFTARROW])
@@ -473,8 +515,14 @@ void test_galaxian_fleet()
             explosion[i].draw(surface);
         }
         fleet.draw(surface);
+        if (gamestats.num_lives_ == 0)
+        {
+            surface.put_image(game_over, game_over_rect);
+        }
         surface.unlock();
         surface.flip();
+
+        }//switch statement end
 
         int frame_end = getTicks();
         int delaytime = FRAME_RATE - frame_end + frame_start;
@@ -1209,6 +1257,12 @@ GameStats::GameStats()
     level_text_rect_.x = W - level_text_rect_.w;
     level_text_rect_.y = H - level_text_rect_.h;
     
+}
+void GameStats::init()
+{
+    num_lives_ = 3;
+    score_ = 0;
+    current_level_ = 1;
 }
 void GameStats::draw(Surface & surface)
 {

@@ -22,6 +22,10 @@
 const int NUM_ROWS = 6;
 const int NUM_COLS = 10;
 
+//const for alien dimensions
+const int ALIEN_W = 32;
+const int ALIEN_H = 32;
+
 void test_galaxian_title_screen();
 void test_galaxian_alien();
 void test_galaxian_player_ship();
@@ -54,6 +58,7 @@ public:
     Rect rect_;
     int dx_;
     int time_of_fleet_death_;
+    int time_of_last_attack_;
 private:
 };
 
@@ -68,6 +73,9 @@ public:
     virtual Rect & rect() = 0;
     virtual int & state() = 0;
 
+protected:
+    int row_;
+    int col_;
 /*
 //protected:
     Rect rect_;
@@ -81,7 +89,8 @@ public:
 class AquaAlien : public Alien
 {
 public:
-    AquaAlien(int x = 0, int y = 0);
+    AquaAlien(int x = 0, int y = 0,
+            int row = 0, int col = 0);
 
     void run();
     void draw(Surface &) const;

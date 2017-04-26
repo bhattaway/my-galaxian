@@ -517,6 +517,7 @@ void Fleet::init()
     recalculate_num_aliens_alive();
 
     time_of_fleet_death_ = 0;
+    time_of_last_attack_ = getTicks();
 }
 
 void Fleet::delete_alien()
@@ -542,6 +543,18 @@ void Fleet::run()
         {
             switch_state(1);
             dx_ = -dx_;
+        }
+        if (getTicks() - time_of_last_attack_ > 3000)
+        {
+            int randrow = rand() % NUM_ROWS;
+            int randcol = rand() % NUM_COLS;
+            while (!alien[randrow][randcol]->isAlive())
+            {
+                randrow = rand() % NUM_ROWS;
+                randcol = rand() % NUM_COLS;
+            }
+            alien[randrow][randcol]->state() = 2; //attack state
+            time_of_last_attack_ = getTicks();
         }
         for (int row = 0; row < NUM_ROWS; ++row)
         {
@@ -686,7 +699,7 @@ Rect & Fleet::rect()
 
 Image AquaAlien::image_("images/galaxian/GalaxianAquaAlien.gif");
 
-AquaAlien::AquaAlien(int x, int y)
+AquaAlien::AquaAlien(int x, int y, int row, int col)
       : state_(0),
       isAlive_(true),
       dx_(3),
@@ -695,7 +708,8 @@ AquaAlien::AquaAlien(int x, int y)
     rect_ = image_.getRect();
     rect_.x = x;
     rect_.y = y;
-
+    row_ = row;
+    col_ = col;
 }
 
 void AquaAlien::run()

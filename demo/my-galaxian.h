@@ -26,6 +26,8 @@ const int NUM_COLS = 10;
 const int ALIEN_W = 32;
 const int ALIEN_H = 32;
 
+const int MAX_SCORE_DIGITS = 9;
+
 void test_galaxian_title_screen();
 void test_galaxian_alien();
 void test_galaxian_player_ship();
@@ -47,7 +49,7 @@ public:
     void delete_alien();
     void run();
     void draw(Surface &) const;
-    void do_collision(Laser [], int);
+    void do_collision(Laser [], int, GameStats &);
     void do_collision(PlayerShip &, GameStats &);
     void recalculate_num_aliens_alive();
     void switch_state(int);
@@ -150,6 +152,9 @@ public:
     void moveLeft();
     bool & isAlive();
     Rect & rect();
+    void init();
+
+    int time_of_death_;
 
 private:
     Rect rect_;
@@ -221,7 +226,19 @@ public:
     int num_lives_;
     int score_;
     int current_level_;
+    int game_state_;
+
     static Image ship_image_;
+    Font font_;
+    Image score_text_;
+    Rect score_text_rect_;
+    Image score_number_;
+    Rect score_number_rect_;
+    char score_number_char_ [MAX_SCORE_DIGITS];
+    Image level_text_;
+    Rect level_text_rect_;
+    //Image level_number_;
+    //Rect level_number_rect_;
     Rect ship_rect_;
 private:
 };

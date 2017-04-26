@@ -365,6 +365,7 @@ void test_galaxian_fleet()
     //init lasers and ship
     const int LASER_SIZE = 100;
     PlayerShip ship(0,H-32);
+    ship.init();
     Laser laser[LASER_SIZE];
 
     //init explosion
@@ -388,28 +389,49 @@ void test_galaxian_fleet()
         //handle input
         KeyPressed keypressed = get_keypressed();
 
-        if (keypressed[LEFTARROW])
+        if (ship.isAlive())
         {
-            ship.moveLeft();
-        }
-        if (keypressed[RIGHTARROW])
-        {
-            ship.moveRight();
-        }
-        if (keypressed[SPACE] && ship.isAlive())
-        {
-            if (getTicks() - Laser::timeOfLastLaser_ > 500)
+            if (keypressed[LEFTARROW])
             {
-                int i = 0;
-                while (laser[i].isAlive())
+                ship.moveLeft();
+            }
+            if (keypressed[RIGHTARROW])
+            {
+                ship.moveRight();
+            }
+            if (keypressed[SPACE] && ship.isAlive())
+            {
+                if (getTicks() - Laser::timeOfLastLaser_ > 500)
                 {
-                    ++i;
-                }
+                    int i = 0;
+                    while (laser[i].isAlive())
+                    {
+                        ++i;
+                    }
 
-                laser[i].isAlive() = true;
-                laser[i].rect().x = ship.rect().x + ship.rect().w / 2;
-                laser[i].rect().y = ship.rect().y - laser[i].rect().h + 4;
-                Laser::timeOfLastLaser_ = getTicks();
+                    laser[i].isAlive() = true;
+                    laser[i].rect().x = ship.rect().x + ship.rect().w / 2;
+                    laser[i].rect().y = ship.rect().y - laser[i].rect().h + 4;
+                    Laser::timeOfLastLaser_ = getTicks();
+                }
+            }
+        }
+        else
+        {
+            if (ship.time_of_death_ == 0)
+            {
+                ship.time_of_death_ = getTicks();
+            }
+            if (getTicks() - ship.time_of_death_ > 3000)
+            {
+                if (gamestats.num_lives_ > 0)
+                {
+                    ship.init();
+                }
+                else
+                {
+                    gamestats.game_state_ = 0; //title screen
+                }
             }
         }
 
@@ -429,7 +451,7 @@ void test_galaxian_fleet()
         }
 
         //handle collisions: lasers vs aliens
-        fleet.do_collision(laser, LASER_SIZE);
+        fleet.do_collision(laser, LASER_SIZE, gamestats);
         //collisions: aliens vs playership
         fleet.do_collision(ship, gamestats);
 
@@ -610,7 +632,7 @@ void Fleet::draw(Surface & surface) const
         }
     }
 }
-void Fleet::do_collision(Laser laser[], int laser_size)
+void Fleet::do_collision(Laser laser[], int laser_size, GameStats & gamestats)
 {
     if (num_aliens_alive != 0)
     {
@@ -634,6 +656,7 @@ void Fleet::do_collision(Laser laser[], int laser_size)
                             explosion[k].set(alien[j]->rect().x + alien[j]->rect().w / 2,
                                              alien[j]->rect().y + alien[j]->rect().h / 2);
                                              */
+                            gamestats.score_ += alien[row][col]->score();
                             alien[row][col]->isAlive() = false;
                             laser[i].isAlive() = false;
                             recalculate_num_aliens_alive();
@@ -1049,6 +1072,13 @@ Rect & PlayerShip::rect()
 {
     return rect_;
 }
+void PlayerShip::init()
+{
+    rect_.x = W / 2;
+    rect_.y = H - 64;
+    isAlive_ = true;
+    time_of_death_ = 0;
+}
 
 int Laser::timeOfLastLaser_ = 0;
 Laser::Laser(int x, int y)
@@ -1156,18 +1186,63 @@ Image GameStats::ship_image_("images/galaxian/GalaxianGalaxip.gif");
 GameStats::GameStats()
     : num_lives_(3),
     score_(0),
-    current_level_(1)
+    current_level_(1),
+    font_("fonts/FreeMono.ttf", 20),
+    score_text_(font_.render("Score: ", WHITE)),
+    level_text_(font_.render("Level: ", WHITE)),
+    score_number_(font_.render("0", WHITE))
 {
     ship_rect_ = ship_image_.getRect();
     ship_rect_.x = 0;
     ship_rect_.y = H - ship_rect_.h;
+
+    
+    score_text_rect_ = score_text_.getRect();
+    score_text_rect_.x = 0;
+    score_text_rect_.y = 0;
+
+    score_number_rect_ = score_number_.getRect();
+    score_number_rect_.x = W / 2;
+    score_number_rect_.y = 0;
+
+    level_text_rect_ = level_text_.getRect();
+    level_text_rect_.x = W - level_text_rect_.w;
+    level_text_rect_.y = H - level_text_rect_.h;
+    
 }
 void GameStats::draw(Surface & surface)
 {
+    //draw lives in lower right
     for (int i = 0; i < num_lives_ - 1; ++i)
     {
         surface.put_image(ship_image_, ship_rect_);
         ship_rect_.x += ship_rect_.w;
     }
     ship_rect_.x = 0;
+
+    
+    //draw score in top left
+    surface.put_image(score_text_, score_text_rect_);
+
+    int old_score = score_;
+    for (int i = MAX_SCORE_DIGITS - 1; i >= 0; --i)
+    {
+        score_number_char_[i] = old_score % 10 + '0';
+        //std::cout << 'a' << old_score % 10 << std::endl;
+        old_score /= 10;
+    }
+    /*
+    std::cout << score_number_char_ << std::endl;
+    std::cout << 1 << std::endl;
+    score_number_ = font_.render(score_number_char_, RED);
+    std::cout << 2 << std::endl;
+    score_number_rect_ = score_number_.getRect();
+    std::cout << 3 << std::endl;
+    surface.put_image(score_number_, score_number_rect_);
+    std::cout << 4 << std::endl;
+    */
+
+    //draw levels in bottom right
+    surface.put_image(level_text_, level_text_rect_);
+    
 }

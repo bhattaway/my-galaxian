@@ -1108,6 +1108,44 @@ void test_gamepad()
     }
 }
 
+void test_text()
+{
+    Surface surface(W,H);
+    Event event;
+
+    int n = 42;
+    char c [3];
+
+    for (int i = 1; i >= 0; --i)
+    {
+        c[i] = '0' + n % 10;
+        n /= 10;
+    }
+    c[2] = 0;
+    std::cout << 1 << std::endl;
+    TextSurface ts(c);
+    std::cout << 2 << std::endl;
+
+    while (1)
+    {
+        std::cout << 3 << std::endl;
+        if (event.poll() && event.type() == QUIT) break;
+
+        std::cout << 4 << std::endl;
+
+        surface.lock();
+        surface.fill(BLACK);
+        std::cout << 5 << std::endl;
+        surface.put_text(ts);
+        std::cout << 6 << std::endl;
+        surface.unlock();
+        surface.flip();
+
+        std::cout << 7 << std::endl;
+        delay(30);
+    }
+}
+
 
 /*****************************************************************************
 For our programs involving graphics and sound, the template is this:
@@ -1157,6 +1195,7 @@ int main(int argc, char* argv[])
 	//fancyhelloworld();		// eye candy
 	//test_polygon(false);
 	//test_polygon(true);
+    //test_text();
 
     //test_alien();
 
@@ -1165,7 +1204,8 @@ int main(int argc, char* argv[])
     //test_galaxian_player_ship();
     //test_galaxian_kill_aliens();
     //test_galaxian_starfield();
-    test_galaxian_fleet();
+
+    play_galaxian();
 
     // mouse
     //test_mouse(); // NEW 2013

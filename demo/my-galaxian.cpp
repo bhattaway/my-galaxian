@@ -1,6 +1,6 @@
 #include "my-galaxian.h"
 
-
+//tests a simple title screen demo
 void test_galaxian_title_screen()
 {
     Surface surface(W, H);
@@ -109,7 +109,7 @@ void test_galaxian_player_ship()
         }
         if (keypressed[SPACE])
         {
-            if (getTicks() - Laser::timeOfLastLaser_ > 500)
+            if (getTicks() - Laser::timeOfLastLaser_ > 750)
             {
                 int i = 0;
                 while (laser[i].isAlive())
@@ -354,19 +354,26 @@ void test_galaxian_starfield()
     }
 }
 
-void test_galaxian_fleet()
+
+/****************************************************
+ * THIS IS THE MAIN GAME
+ *******************************************/
+void play_galaxian()
 {
     Surface surface(W,H);
     Event event;
 
     Fleet fleet;
 
+    /*********************************
+     * INITIALIZATION
+     * ********/
     //init fleet
     fleet.init();
     //init lasers and ship
     const int LASER_SIZE = 100;
     PlayerShip ship(0, 0);
-    //ship.init();
+    ship.init();
     Laser laser[LASER_SIZE];
 
     //init explosion
@@ -381,46 +388,111 @@ void test_galaxian_fleet()
 
     GameStats gamestats;
 
+    //fonts for title screen and game over
     Font font1("fonts/FreeMono.ttf", 24);
+    Font font2("fonts/FreeMono.ttf", 22);
 
+    //"WELCOME TO GALAXIAN" image
     Image title_screen(font1.render("WELCOME TO GALAXIAN", GREEN));
     Rect title_screen_rect = title_screen.getRect();
-    title_screen_rect.x = W / 2;
-    title_screen_rect.y = H / 2;
+    title_screen_rect.x = W / 2 - title_screen_rect.w / 2;
+    title_screen_rect.y = H / 2 - title_screen_rect.h / 2;
 
+    //"created by brandon hattaway" image
+    Image my_name(font2.render("created by brandon hattaway", WHITE));
+    Rect my_name_rect = my_name.getRect();
+    my_name_rect.x = W / 2 - my_name_rect.w / 2;
+    my_name_rect.y = H / 2 - my_name_rect.h / 2 + title_screen_rect.h;
+
+    //"press SPACE to begin" image
+    Image press_space(font2.render("press SPACE to begin", GREEN));
+    Rect press_space_rect = press_space.getRect();
+    press_space_rect.x = W / 2 - press_space_rect.w / 2;
+    press_space_rect.y = H / 2 - press_space_rect.h / 2 
+        + title_screen_rect.h + my_name_rect.h;
+
+    /*
+    //"60" image
+    Image sixty(font1.render("60", WHITE));
+    Rect sixty_rect = sixty.getRect();
+    sixty_rect.x = W + 32;
+    sixty_rect.y = H - 128;
+
+    //"50" image
+    Image fifty(font1.render("50", WHITE));
+    Rect fifty_rect = fifty.getRect();
+    fifty_rect.x = W + 32;
+    fifty_rect.y = H - 96;
+    //"40" image
+    Image forty(font1.render("40", WHITE));
+    Rect forty_rect = forty.getRect();
+    forty_rect.x = W + 32;
+    forty_rect.y = H - 64;
+    //"30" image
+    Image thirty(font1.render("30", WHITE));
+    Rect thirty_rect = thirty.getRect();
+    thirty_rect.x = W + 32;
+    thirty_rect.y = H - 32;
+    
+    Alien * example_aliens [4];
+
+    example_aliens[0] = new YellowAlien(W, H - 128);
+    example_aliens[1] = new RedAlien(W, H - 96);
+    example_aliens[2] = new PurpleAlien(W, H - 64);
+    example_aliens[3] = new AquaAlien(W, H - 32);
+    */
+
+    //"GAME OVER" image
     Image game_over(font1.render("GAME OVER", RED));
     Rect game_over_rect = game_over.getRect();
-    game_over_rect.x = W / 2;
-    game_over_rect.y = H / 2;
+    game_over_rect.x = W / 2 - game_over_rect.w / 2;
+    game_over_rect.y = H / 2 - game_over_rect.h / 2;
 
-    //game loop
+    /*************
+     * GAME LOOP
+     * *********************/
     while (1)
     {
         if (event.poll() && event.type() == QUIT) break;
 
-        int frame_start = getTicks();
+        int frame_start = getTicks(); //used at the end of the loop
+                                      //to determine how long to delay
         //handle input
         KeyPressed keypressed = get_keypressed();
 
+        /**********
+         * STATE 0: TITLE SCREEN
+         * STATE 1: INITIALIZING THE GAME
+         * STATE 2: MAIN GAME
+         * *******/
         switch (gamestats.game_state_)
         {
-    case 0:
+    case 0: //TITLE SCREEN
 
+        //if press space, initialize, then start the game
         if (keypressed[SPACE])
         {
             gamestats.game_state_ = 1; //init state
         }
+
+        //make all stars move
         for (int i = 0; i < NUM_STARS; ++i)
         {
             star[i].run();
         }
+
+        //draw title screen
         surface.lock();
         surface.fill(BLACK);
+
         surface.put_image(title_screen, title_screen_rect);
+        surface.put_image(my_name, my_name_rect);
+        surface.put_image(press_space, press_space_rect);
         for (int i = 0; i < NUM_STARS; ++i)
         {
             star[i].draw(surface);
         }
+
         surface.unlock();
         surface.flip();
         break;
@@ -428,10 +500,12 @@ void test_galaxian_fleet()
         fleet.init();
         ship.init();
         gamestats.init();
-        gamestats.game_state_ = 2;
+        gamestats.game_state_ = 2; //go to main game
         break;
 
-    case 2: //game loop
+    case 2: //main game 
+        
+        //handling input and moving the Player accordingly
         if (ship.isAlive())
         {
             if (keypressed[LEFTARROW])
@@ -442,36 +516,46 @@ void test_galaxian_fleet()
             {
                 ship.moveRight();
             }
+
+            //if SPACE, fire a laser
             if (keypressed[SPACE] && ship.isAlive())
             {
+                //time limit for how quickly you can shoot lasers
                 if (getTicks() - Laser::timeOfLastLaser_ > 500)
                 {
+                    //find a laser that is not alive
                     int i = 0;
                     while (laser[i].isAlive())
                     {
                         ++i;
                     }
 
+                    //create the laser
                     laser[i].isAlive() = true;
                     laser[i].rect().x = ship.rect().x + ship.rect().w / 2;
                     laser[i].rect().y = ship.rect().y - laser[i].rect().h + 4;
+
+                    //update laser time constraint
                     Laser::timeOfLastLaser_ = getTicks();
                 }
             }
         }
-        else
+        else //ship is dead
         {
-            if (ship.time_of_death_ == 0)
+            if (ship.time_of_death_ == 0) //first time in this section
             {
                 ship.time_of_death_ = getTicks();
             }
+
+            //takes 3 seconds to respawn
             if (getTicks() - ship.time_of_death_ > 3000)
             {
+                //if you have lives, respawn
                 if (gamestats.num_lives_ > 0)
                 {
                     ship.init();
                 }
-                else
+                else //if you dont have lives, game over, go back to title
                 {
                     gamestats.game_state_ = 0; //title screen
                 }
@@ -517,6 +601,8 @@ void test_galaxian_fleet()
             explosion[i].draw(surface);
         }
         fleet.draw(surface);
+
+        //if no more lives, GAME OVER
         if (gamestats.num_lives_ == 0)
         {
             surface.put_image(game_over, game_over_rect);
@@ -526,14 +612,17 @@ void test_galaxian_fleet()
 
         }//switch statement end
 
+        //calculate delay between frames to keep a constant framerate
         int frame_end = getTicks();
         int delaytime = FRAME_RATE - frame_end + frame_start;
         if (delaytime > 0) delay(delaytime);
     }
 
+    //free memory used by aliens
     fleet.delete_alien();
 }
 
+//check to see if two Rects overlap.
 bool isCollision(const Rect & r0, const Rect & r1)
 {
     int r0xp = r0.x + r0.w; //stands for r0.x(prime)
@@ -563,20 +652,29 @@ bool isCollision(const Rect & r0, const Rect & r1)
 
 int Fleet::fleet_state = 0;
 Rect Fleet::rect_;
+
+//initializes the fleet
 void Fleet::init()
 {
+    //row 0 is YellowAliens
     for (int col = 0; col < NUM_COLS; ++col)
     {
         alien[0][col] = new YellowAlien(32 * col, 1 * 32, 0, col);
     }
+
+    //row 1 is RedAliens
     for (int col = 0; col < NUM_COLS; ++col)
     {
         alien[1][col] = new RedAlien(32 * col, 2 * 32, 1, col);
     }
+
+    //row 2 is PurpleAliens
     for (int col = 0; col < NUM_COLS; ++col)
     {
         alien[2][col] = new PurpleAlien(32 * col, 3 * 32, 2, col);
     }
+
+    //rows 3-6 are AquaAliens
     for (int row = 3; row < NUM_ROWS; ++row)
     {
         for (int col = 0; col < NUM_COLS; ++col)
@@ -584,6 +682,9 @@ void Fleet::init()
             alien[row][col] = new AquaAlien(32 * col, 32 * row + 32, row, col);
         }
     }
+
+    //make the fleet look better, take away excess aliens.
+    //(resembles original Galaxian game)
     alien[0][0]->isAlive() = false;
     alien[0][1]->isAlive() = false;
     alien[0][2]->isAlive() = false;
@@ -599,8 +700,10 @@ void Fleet::init()
     alien[2][0]->isAlive() = false;
     alien[2][9]->isAlive() = false;
 
+    //change fleet state to moving right
     switch_state(0);
 
+    //initialize fleet rectangle
     rect_.w = alien[0][0]->rect().w * NUM_COLS;
     rect_.h = alien[0][0]->rect().h * NUM_ROWS;
     rect_.x = 10;
@@ -609,8 +712,11 @@ void Fleet::init()
 
     time_of_fleet_death_ = 0;
     time_of_last_attack_ = getTicks();
+
+    ++GameStats::current_level_;
 }
 
+//free memory used by aliens
 void Fleet::delete_alien()
 {
     for (int row = 0; row < NUM_ROWS; ++row)
@@ -621,22 +727,32 @@ void Fleet::delete_alien()
         }
     }
 }
+
+//runs each alien in the fleet
 void Fleet::run()
 {
+    //if the entire fleet is not dead
     if (num_aliens_alive != 0)
     {
+        //if you hit the left boundary, move right
         if (rect_.x < 10)
         {
             switch_state(0);
             dx_ = -dx_;
         }
+
+        //if you hit the right boundary, move left
         if (rect_.x + rect_.w > W)
         {
             switch_state(1);
             dx_ = -dx_;
         }
-        if (getTicks() - time_of_last_attack_ > 1250)
+
+        //determine if there should be an attack
+        //(one attack every second)
+        if (getTicks() - time_of_last_attack_ > 1000)
         {
+            //generate a random alien for attacking
             int randrow = rand() % NUM_ROWS;
             int randcol = rand() % NUM_COLS;
             while (!alien[randrow][randcol]->isAlive())
@@ -644,7 +760,9 @@ void Fleet::run()
                 randrow = rand() % NUM_ROWS;
                 randcol = rand() % NUM_COLS;
             }
+
             alien[randrow][randcol]->state() = 3; //prepare attack state
+
             if (randrow == 0) //if the yellow alien is chosen
                               //make the red aliens below it attack too
             {
@@ -652,8 +770,12 @@ void Fleet::run()
                 alien[randrow + 1][randcol - 1]->state() = 3;
                 alien[randrow + 1][randcol + 1]->state() = 3;
             }
+
+            //reset attack timer
             time_of_last_attack_ = getTicks();
         }
+
+        //run all the aliens
         for (int row = 0; row < NUM_ROWS; ++row)
         {
             for (int col = 0; col < NUM_COLS; ++col)
@@ -662,24 +784,29 @@ void Fleet::run()
             }
         }
 
+        //move the fleet rect
         rect_.x += dx_;
-        //std::cout << rect_ << std::endl;
     }
-    else
+    else //every alien is dead
     {
-        if(time_of_fleet_death_ == 0)
+        if(time_of_fleet_death_ == 0) //first time in this block
         {
             delete_alien();
             time_of_fleet_death_ = getTicks();
         }
-        if(getTicks() - time_of_fleet_death_ > 5000)
+
+        //spawn another wave of aliens after 4 seconds
+        if(getTicks() - time_of_fleet_death_ > 4000)
         {
             init();
         }
     }
 }
+
+//draw all of the aliens
 void Fleet::draw(Surface & surface) const
 {
+    //if the fleet is alive
     if (num_aliens_alive != 0)
     {
         for (int row = 0; row < NUM_ROWS; ++row)
@@ -691,33 +818,42 @@ void Fleet::draw(Surface & surface) const
         }
     }
 }
+
+//check and handle collisions between Lasers and Aliens
 void Fleet::do_collision(Laser laser[], int laser_size, 
         Explosion explosion [], int explosion_size, GameStats & gamestats)
 {
-    if (num_aliens_alive != 0)
+    if (num_aliens_alive != 0) //if the fleet is alive
     {
         //each laser vs each alien
         for (int i = 0; i < laser_size; ++i)
         {
-            if (laser[i].isAlive())
+            if (laser[i].isAlive()) //if this laser is alive
             {
+                //check each alien
                 for (int row = 0; row < NUM_ROWS; ++row)
                 {
                     for (int col = 0; col < NUM_COLS; ++col)
                     {
+                        //if this alien is alive, and there is a collision
                         if (alien[row][col]->isAlive() 
                           && isCollision(laser[i].rect(), alien[row][col]->rect()))
                         {
+                            //find an explosion that is dead
                             int k = 0;
                             while (explosion[k].isAlive())
                                 ++k;
 
+                            //set the explosion at the center of the alien
                             explosion[k].set(alien[row][col]->rect().x 
                                     + alien[row][col]->rect().w / 2,
                                     alien[row][col]->rect().y 
                                     + alien[row][col]->rect().h / 2);
 
+                            //add points to score
                             gamestats.score_ += alien[row][col]->score();
+
+                            //kill alien and laser
                             alien[row][col]->isAlive() = false;
                             laser[i].isAlive() = false;
                             recalculate_num_aliens_alive();
@@ -728,50 +864,70 @@ void Fleet::do_collision(Laser laser[], int laser_size,
         }
     }
 }
+
+//check and handle collisions between the Player and each alien
 void Fleet::do_collision(PlayerShip & ship, Explosion explosion[],
        int explosion_size, GameStats & gamestats)
 {
-    if (num_aliens_alive != 0)
+    if (num_aliens_alive != 0) //if the fleet is alive
     {
         //check collision of aliens vs player ship
-        for (int row = 0; row < NUM_ROWS; ++row)
+        for (int row = 0; row < NUM_ROWS; ++row) //go thru each alien
         {
             for (int col = 0; col < NUM_COLS; ++col)
             {
+                //if the alien is alive
+                //AND the alien is in attack mode
+                //(if the alien is in fleet mode, it cannot collide with
+                //the player)
+                //AND there is a collision between this alien and the player
+                //AND the player is alive
                 if (alien[row][col]->isAlive()
                    && alien[row][col]->state() == 2
                    && isCollision(alien[row][col]->rect(), ship.rect())
                    && ship.isAlive())
                 {
+                    //find a dead explosion
                     int k = 0;
                     while (explosion[k].isAlive())
                         ++k;
 
+                    //set that explosion at the middle of this alien
                     explosion[k].set(alien[row][col]->rect().x 
                             + alien[row][col]->rect().w / 2, 
                                      alien[row][col]->rect().y 
                                      + alien[row][col]->rect().h / 2);
 
+                    //find another dead explosion
                     k = 0;
                     while (explosion[k].isAlive())
                         ++k;
 
-                    //explosion for player ship
+                    //set that explosion at the middle of the player ship
                     explosion[k].set(ship.rect().x + ship.rect().w / 2, 
                                      ship.rect().y + ship.rect().h / 2);
                                      
 
+                    //kill alien
                     alien[row][col]->isAlive() = false;
+
+                    //add points to score
                     gamestats.score_ += alien[row][col]->score();
 
+                    //kill ship
                     ship.isAlive() = false;
+
+                    //take away a life
                     --gamestats.num_lives_;
+
                     recalculate_num_aliens_alive();
                 }
             }
         }
     }
 }
+
+//recalculates the number of aliens that are currently alive
 void Fleet::recalculate_num_aliens_alive()
 {
     num_aliens_alive = 0;
@@ -783,25 +939,34 @@ void Fleet::recalculate_num_aliens_alive()
         }
     }
 }
+
+//switches the state of aliens that are moving back and forth in the fleet.
+//if the alien is attacking, do NOT change it's state
 void Fleet::switch_state(int new_state)
 {
     for (int row = 0; row < NUM_ROWS; ++row)
     {
         for (int col = 0; col < NUM_COLS; ++col)
         {
+            //if this alien is not attacking, change its state
             if (alien[row][col]->state() != 2) //2 is attack state
             {
                 alien[row][col]->state() = new_state;
             }
         }
     }
+
+    //change fleet state as well
     fleet_state = new_state;
 }
+
+//returns a reference of the Fleet rect
 Rect & Fleet::rect()
 {
     return rect_;
 }
 
+//parent class for each of the Aliens.
 Alien::Alien(int x, int y, int row, int col)
     : row_(row),
     col_(col),
@@ -840,6 +1005,7 @@ int Alien::score() const
 
 Image AquaAlien::image_("images/galaxian/GalaxianAquaAlien.gif");
 
+//AquaAlien, the most numerous alien
 AquaAlien::AquaAlien(int x, int y, int row, int col)
     : Alien(x, y, row, col)
 { 
@@ -851,64 +1017,86 @@ AquaAlien::AquaAlien(int x, int y, int row, int col)
 
 void AquaAlien::run()
 {
+    //if this alien is alive
     if (isAlive_)
     {
-        switch (state_)
+        switch (state_) 
         {
             case 0: //passive in fleet, moving right
-                rect_.x += dx_;
-                if (rect_.y < row_ * 32 + 32)
+
+                rect_.x += dx_; //move to the right
+
+                if (rect_.y < row_ * 32 + 32) //if this alien is returning
+                                              //from an attack, move it
+                                              //downwards until it is in
+                                              //it's original spot in 
+                                              //the fleet
                 {
                     rect_.y += dy_;
                 }
+
+                //if this alien goes out of bounds, reset it
                 if (rect_.x < 0)
                 {
                     rect_.x = 0;
-                    //dx_ = -dx_;
                 }
                 else if ((rect_.x + rect_.w) > (W - 1))
                 {
                     rect_.x = W - 1 - rect_.w;
-                    //dx_ = -dx_;
                 }
 
                 //if (rand() % 100 == 0) state_ = 1;
                 break;
             case 1: //passive in fleet, moving left
+                //if alien is returning from an attack, move down
+                //until it hits original spot
                 if (rect_.y < row_ * 32 + 32)
                 {
                     rect_.y += dy_;
                 }
+
+                //move to the left
                 rect_.x -= dx_;
 
+                //if alien goes out of bounds, reset it
                 if (rect_.x < 0)
                 {
                     rect_.x = 0;
-                    //dx_ = -dx_;
                 }
                 else if ((rect_.x + rect_.w) > (W - 1))
                 {
                     rect_.x = W - 1 - rect_.w;
-                    //dx_ = -dx_;
                 }
                 break;
+
             case 2: //attack
+
+                //move downwards
                 rect_.y += dy_;
+
+                //if the alien is within 50px of its destination, slow it down
+                //to 1 (horizontal movement)
                 if (rect_.x - 50 < destination_x_
                         && destination_x_ < rect_.x + 50)
                 {
                     dx_ = 1;
                 }
+                //if alien is within 100px of destination, slow down to 3
+                //(horizontal movement)
                 else if (rect_.x - 100 < destination_x_
                         && destination_x_ < rect_.x + 100)
                 {
                     dx_ = 3;
                 }
+                //if alien is within 250px of destination, change to 4
+                //(horizontal movement)
                 else if (rect_.x - 250 < destination_x_
                         && destination_x_ < rect_.x + 250)
                 {
                     dx_ = 4;
                 }
+
+                //move towards the destination
                 if (destination_x_ > rect_.x)
                 {
                     rect_.x += dx_;
@@ -917,22 +1105,34 @@ void AquaAlien::run()
                 {
                     rect_.x -= dx_;
                 }
+
+                //if alien goes out of bounds
                 if (rect_.y > H)
                 {
-                    dx_ = 2;
+                    dx_ = 2; //reset horizontal movement to regular 
+                            // fleet speed
+
+                    //set coordinates at top of screen
                     rect_.x = 32 * col_ + Fleet::rect_.x - 10;
                     rect_.y = 32;
+
+                    //get proper state
                     state_ = Fleet::fleet_state;
                 }
                 break;
             case 3: //prepare attack
+
+                //generate random destination
                 destination_x_ = rand() % (W - 32);
+
+                //change to attack state
                 state_ = 2;
                 break;
         }
     }
 }
 
+//draws the alien
 void AquaAlien::draw(Surface & surface) const
 {
     if (isAlive_) surface.put_image(image_, rect_);
@@ -955,6 +1155,7 @@ void RedAlien::run()
     {
         switch (state_)
         {
+            //case 0 and case 1 are same as AquaAlien. see comments there.
             case 0: //passive in fleet, moving right
                 rect_.x += dx_;
                 if (rect_.y < row_ * 32 + 32)
@@ -993,12 +1194,18 @@ void RedAlien::run()
                 }
                 break;
             case 2: //attack
+
+                //move downwards
                 rect_.y += dy_;
+
+                //if within 75px, slow down horizontal movement to 1
                 if (rect_.x - 75 < destination_x_
                         && destination_x_ < rect_.x + 75)
                 {
                     dx_ = 1;
                 }
+
+                //move towards destination
                 if (rect_.x < destination_x_)
                 {
                     rect_.x += dx_;
@@ -1007,17 +1214,47 @@ void RedAlien::run()
                 {
                     rect_.x -= dx_;
                 }
+
+                //if alien goes out of bounds
                 if (rect_.y > H)
                 {
-                    dx_ = 2;
+                    dx_ = 2; //reset horizontal movement
+
+                    //reset coordinates at top of screen
                     rect_.x = 32 * col_ + Fleet::rect_.x - 10;
                     rect_.y = 32;
+
+                    //sync state with fleet 
                     state_ = Fleet::fleet_state;
                 }
                 break;
             case 3: //prepare attack
+
+                //generate random destination (done with getTicks
+                //in order to sync with YellowAlien when traveling
+                //in a group)
                 destination_x_ = getTicks() % (W - 32);
 
+                //if destination was in the right third of the screen,
+                //set it to all the way Right
+                if (destination_x_ > 2 * W / 3)
+                {
+                    destination_x_ = W;
+                }
+                //if destination was in the left third of the screen,
+                //set it to all the way Left
+                else if (destination_x_ < W / 3)
+                {
+                    destination_x_ = 0;
+                }
+                //if destination was in the middle third of the screen,
+                //set it to the middle
+                else
+                {
+                    destination_x_ = W / 2;
+                }
+
+                //set state to attack
                 state_ = 2;
                 break;
         }
@@ -1046,6 +1283,7 @@ void PurpleAlien::run()
     {
         switch (state_)
         {
+            //case 0 and 1 are same as AquaAlien, refer there for comments
             case 0: //passive in fleet, moving right
                 rect_.x += dx_;
                 if (rect_.y < row_ * 32 + 32)
@@ -1084,7 +1322,11 @@ void PurpleAlien::run()
                 }
                 break;
             case 2: //attack
+                //this is very similar to AquaAlien. refer there
+                //for additional comments
                 rect_.y += dy_;
+
+                //if within 10px of destination, generate new destination
                 if (rect_.x - 10 < destination_x_
                         && destination_x_ < rect_.x + 10)
                 {
@@ -1122,6 +1364,8 @@ void PurpleAlien::run()
                 }
                 break;
             case 3: //initialize attack
+
+                //same as AquaAlien
                 attack_initial_x_ = rect_.x;
                 destination_x_ = rand() % (W - 32);
 
@@ -1155,6 +1399,7 @@ void YellowAlien::run()
     {
         switch (state_)
         {
+            //see AquaAlien for comments about case 0 and 1
             case 0: //passive in fleet, moving right
                 rect_.x += dx_;
                 if (rect_.y < row_ * 32 + 32)
@@ -1193,6 +1438,7 @@ void YellowAlien::run()
                 }
                 break;
             case 2: //attack
+                //exact same as RedAlien attack
                 rect_.y += dy_;
                 if (rect_.x - 75 < destination_x_
                         && destination_x_ < rect_.x + 75)
@@ -1216,8 +1462,17 @@ void YellowAlien::run()
                 }
                 break;
             case 3: //prepare attack
+                //exact same as Red Alien
                 destination_x_ = getTicks() % (W - 32);
 
+                if (destination_x_ > W / 2)
+                {
+                    destination_x_ = W;
+                }
+                else
+                {
+                    destination_x_ = 0;
+                }
                 state_ = 2;
                 break;
         }
@@ -1239,7 +1494,7 @@ PlayerShip::PlayerShip(int x, int y)
 {
     rect_ = image_.getRect();
     rect_.x = x;
-    rect_.y = y;
+    //rect_.y = y;
 }
 
 void PlayerShip::moveRight()
@@ -1319,7 +1574,7 @@ Explosion::Explosion()
     x_(0),
     y_(0),
     r_(1),
-    dr_(1)
+    dr_(1) //similar to dx_ or dy_ for other classes, except this is for radius
 { }
 
 void Explosion::set(int x, int y)
@@ -1334,6 +1589,8 @@ void Explosion::run()
     if (isAlive_)
     {
         r_ += dr_;
+
+        //once explosion expands enough, kill it
         if (r_ > 30) isAlive_ = false;
     }
 }
@@ -1341,9 +1598,14 @@ void Explosion::draw(Surface & surface) const
 {
     if (isAlive_)
     {
-        surface.put_unfilled_circle(x_, y_, r_, RED);
-        surface.put_unfilled_circle(x_, y_, r_ / 1.2, YELLOW);
-        surface.put_unfilled_circle(x_, y_, r_ / 2, WHITE);
+        //large red circle on bottom
+        surface.put_circle(x_, y_, r_, RED);
+
+        //medium yellow circle
+        surface.put_circle(x_, y_, r_ / 1.2, YELLOW);
+        
+        //small white circle on top
+        surface.put_circle(x_, y_, r_ / 2, WHITE);
     }
 }
 bool & Explosion::isAlive()
@@ -1353,17 +1615,20 @@ bool & Explosion::isAlive()
 
 Star::Star(int x, int y)
     : dx_(0),
-    dy_(rand() % 4 + 1),
+    dy_(rand() % 4 + 1), //randomize vertical speed
     color_(rand_color())
 {
-    rect_.x = rand() % W;
+    rect_.x = rand() % W; //randomize position
     rect_.y = rand() % H;
-    rect_.w = 1;
+    rect_.w = 1; //1x1 pixel
     rect_.h = 1;
 }
 void Star::run()
 {
+    //move downwards
     rect_.y += dy_;
+
+    //if out of bounds, generate a new star at the top
     if (rect_.y > H) 
     {
         rect_.x = rand() % W;
@@ -1371,9 +1636,6 @@ void Star::run()
         dy_ = rand() % 4 + 1;
         color_ = rand_color();
     }
-    //color_.R;
-    //color_.G += dG_;
-    //color_.B += dB_;
 }
 void Star::draw(Surface & surface) const
 {
@@ -1381,39 +1643,49 @@ void Star::draw(Surface & surface) const
 }
 
 Image GameStats::ship_image_("images/galaxian/GalaxianGalaxip.gif");
+int GameStats::current_level_(1);
+
+//contains useful stats about the game
 GameStats::GameStats()
     : num_lives_(3),
     score_(0),
-    current_level_(1),
-    font_("fonts/FreeMono.ttf", 20),
+    font_("fonts/FreeMono.ttf", 20), //used for printing "Score" and "Level"
     score_text_(font_.render("Score: ", WHITE)),
     level_text_(font_.render("Level: ", WHITE)),
     score_number_(font_.render("0", WHITE))
 {
+    //used to print the Lives in the lower left
     ship_rect_ = ship_image_.getRect();
     ship_rect_.x = 0;
     ship_rect_.y = H - ship_rect_.h;
 
     
+    //used to print the score in the upper left
     score_text_rect_ = score_text_.getRect();
-    score_text_rect_.x = 0;
+    score_text_rect_.x = 5;
     score_text_rect_.y = 0;
 
+    //used to print the score number in the upper left
     score_number_rect_ = score_number_.getRect();
     score_number_rect_.x = W / 2;
     score_number_rect_.y = 0;
 
+    //used to print the "Level:" int he lower right
     level_text_rect_ = level_text_.getRect();
-    level_text_rect_.x = W - level_text_rect_.w;
-    level_text_rect_.y = H - level_text_rect_.h;
+    level_text_rect_.x = W - level_text_rect_.w - 40;
+    level_text_rect_.y = H - level_text_rect_.h - 0;
     
 }
+
+//initialize the game stats (used at the start of a new game
 void GameStats::init()
 {
     num_lives_ = 3;
     score_ = 0;
     current_level_ = 1;
 }
+
+//draw various things on the screen
 void GameStats::draw(Surface & surface)
 {
     //draw lives in lower left
@@ -1425,9 +1697,10 @@ void GameStats::draw(Surface & surface)
     ship_rect_.x = 0;
 
     
-    //draw score in top left
+    //draw "Score:" in top left
     surface.put_image(score_text_, score_text_rect_);
 
+    //put score into a character array
     int old_score = score_;
     for (int i = MAX_SCORE_DIGITS - 1; i >= 0; --i)
     {
@@ -1435,18 +1708,21 @@ void GameStats::draw(Surface & surface)
         //std::cout << 'a' << old_score % 10 << std::endl;
         old_score /= 10;
     }
-    /*
-    std::cout << score_number_char_ << std::endl;
-    std::cout << 1 << std::endl;
-    score_number_ = font_.render(score_number_char_, RED);
-    std::cout << 2 << std::endl;
-    score_number_rect_ = score_number_.getRect();
-    std::cout << 3 << std::endl;
-    surface.put_image(score_number_, score_number_rect_);
-    std::cout << 4 << std::endl;
-    */
+    //put the character array into text
+    TextSurface score_num(score_number_char_);
+    //draw score number in the upper left
+    surface.put_text(score_num, 80, 5);
 
+    //put level number into a char array
+    int old_level_num = current_level_;
+    for (int i = 2; i >= 0; --i)
+    {
+        level_number_char_[i] = old_level_num % 10 + '0';
+        old_level_num /= 10;
+    }
     //draw levels in bottom right
+    TextSurface level_num(level_number_char_);
     surface.put_image(level_text_, level_text_rect_);
+    surface.put_text(level_num, W - 42, H - 27);
     
 }

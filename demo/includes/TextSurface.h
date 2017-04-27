@@ -13,7 +13,7 @@
 class TextSurface
 {
 public:
-	TextSurface( char str[]="Hello, World!", char fontfamily[]="arial.ttf", int size=12, int R=255, int G=255, int B=255 )
+	TextSurface( char str[]="Hello, World!", char fontfamily[]="fonts/FreeMonoOblique.ttf", int size=20, int R=255, int G=100, int B=100 )
 	{
 		atexit( TTF_Quit );
 		if ( TTF_Init() != 0 )

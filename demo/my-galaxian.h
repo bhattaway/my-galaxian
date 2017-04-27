@@ -33,7 +33,7 @@ void test_galaxian_alien();
 void test_galaxian_player_ship();
 void test_galaxian_kill_aliens();
 void test_galaxian_starfield();
-void test_galaxian_fleet();
+void play_galaxian();
 
 bool isCollision(const Rect &, const Rect &);
 
@@ -229,7 +229,7 @@ public:
 
     int num_lives_;
     int score_;
-    int current_level_;
+    static int current_level_;
     int game_state_;
 
     static Image ship_image_;
@@ -240,6 +240,7 @@ public:
     Rect score_number_rect_;
     char score_number_char_ [MAX_SCORE_DIGITS];
     Image level_text_;
+    char level_number_char_ [3];
     Rect level_text_rect_;
     //Image level_number_;
     //Rect level_number_rect_;

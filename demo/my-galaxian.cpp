@@ -635,7 +635,7 @@ void Fleet::run()
             switch_state(1);
             dx_ = -dx_;
         }
-        if (getTicks() - time_of_last_attack_ > 1000)
+        if (getTicks() - time_of_last_attack_ > 1250)
         {
             int randrow = rand() % NUM_ROWS;
             int randcol = rand() % NUM_COLS;
@@ -645,6 +645,13 @@ void Fleet::run()
                 randcol = rand() % NUM_COLS;
             }
             alien[randrow][randcol]->state() = 3; //prepare attack state
+            if (randrow == 0) //if the yellow alien is chosen
+                              //make the red aliens below it attack too
+            {
+                alien[randrow + 1][randcol]->state() = 3;
+                alien[randrow + 1][randcol - 1]->state() = 3;
+                alien[randrow + 1][randcol + 1]->state() = 3;
+            }
             time_of_last_attack_ = getTicks();
         }
         for (int row = 0; row < NUM_ROWS; ++row)

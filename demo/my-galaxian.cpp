@@ -994,14 +994,30 @@ void RedAlien::run()
                 break;
             case 2: //attack
                 rect_.y += dy_;
+                if (rect_.x - 75 < destination_x_
+                        && destination_x_ < rect_.x + 75)
+                {
+                    dx_ = 1;
+                }
+                if (rect_.x < destination_x_)
+                {
+                    rect_.x += dx_;
+                }
+                else
+                {
+                    rect_.x -= dx_;
+                }
                 if (rect_.y > H)
                 {
+                    dx_ = 2;
                     rect_.x = 32 * col_ + Fleet::rect_.x - 10;
                     rect_.y = 32;
                     state_ = Fleet::fleet_state;
                 }
                 break;
             case 3: //prepare attack
+                destination_x_ = getTicks() % (W - 32);
+
                 state_ = 2;
                 break;
         }
@@ -1178,14 +1194,30 @@ void YellowAlien::run()
                 break;
             case 2: //attack
                 rect_.y += dy_;
+                if (rect_.x - 75 < destination_x_
+                        && destination_x_ < rect_.x + 75)
+                {
+                    dx_ = 1;
+                }
+                if (rect_.x < destination_x_)
+                {
+                    rect_.x += dx_;
+                }
+                else
+                {
+                    rect_.x -= dx_;
+                }
                 if (rect_.y > H)
                 {
+                    dx_ = 2;
                     rect_.x = 32 * col_ + Fleet::rect_.x - 10;
                     rect_.y = 32;
                     state_ = Fleet::fleet_state;
                 }
                 break;
             case 3: //prepare attack
+                destination_x_ = getTicks() % (W - 32);
+
                 state_ = 2;
                 break;
         }
@@ -1309,9 +1341,9 @@ void Explosion::draw(Surface & surface) const
 {
     if (isAlive_)
     {
-        surface.put_circle(x_, y_, r_, RED);
-        surface.put_circle(x_, y_, r_ / 1.2, YELLOW);
-        surface.put_circle(x_, y_, r_ / 2, WHITE);
+        surface.put_unfilled_circle(x_, y_, r_, RED);
+        surface.put_unfilled_circle(x_, y_, r_ / 1.2, YELLOW);
+        surface.put_unfilled_circle(x_, y_, r_ / 2, WHITE);
     }
 }
 bool & Explosion::isAlive()

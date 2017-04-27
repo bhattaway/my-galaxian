@@ -1,5 +1,6 @@
 #include "my-galaxian.h"
 
+int Laser::timeOfLastLaser_ = 0;
 
 void test_galaxian_title_screen()
 {
@@ -452,9 +453,9 @@ void test_galaxian_fleet()
                         ++i;
                     }
 
-                    laser[i].isAlive() = true;
-                    laser[i].rect().x = ship.rect().x + ship.rect().w / 2;
-                    laser[i].rect().y = ship.rect().y - laser[i].rect().h + 4;
+                    laser[i].set(ship.rect().x + ship.rect().w / 2,
+                                ship.rect().y - laser[i].rect().h,
+                                -8);
                     Laser::timeOfLastLaser_ = getTicks();
                 }
             }
@@ -810,6 +811,7 @@ Alien::Alien(int x, int y, int row, int col)
     dx_(2),
     dy_(4)
 {
+    laser_.isAlive() = false;
     rect_.x = x;
     rect_.y = y;
 }
@@ -931,11 +933,13 @@ void AquaAlien::run()
                 break;
         }
     }
+    laser_.run();
 }
 
 void AquaAlien::draw(Surface & surface) const
 {
     if (isAlive_) surface.put_image(image_, rect_);
+    laser_.draw(surface);
 }
 
 Image RedAlien::image_("images/galaxian/GalaxianRedAlien.gif");
@@ -1278,7 +1282,6 @@ void PlayerShip::init()
     time_of_death_ = 0;
 }
 
-int Laser::timeOfLastLaser_ = 0;
 Laser::Laser(int x, int y)
     : dx_(0),
     dy_(-8),
@@ -1314,6 +1317,14 @@ Rect & Laser::rect()
     return rect_;
 }
 
+void Laser::set(int x, int y, int dy)
+{
+    rect_.x = x;
+    rect_.y = y;
+    dy_ = dy;
+    isAlive_ = true;
+}
+
 Explosion::Explosion()
     : isAlive_(false),
     x_(0),
@@ -1341,9 +1352,9 @@ void Explosion::draw(Surface & surface) const
 {
     if (isAlive_)
     {
-        surface.put_unfilled_circle(x_, y_, r_, RED);
-        surface.put_unfilled_circle(x_, y_, r_ / 1.2, YELLOW);
-        surface.put_unfilled_circle(x_, y_, r_ / 2, WHITE);
+        surface.put_circle(x_, y_, r_, RED);
+        surface.put_circle(x_, y_, r_ / 1.2, YELLOW);
+        surface.put_circle(x_, y_, r_ / 2, WHITE);
     }
 }
 bool & Explosion::isAlive()

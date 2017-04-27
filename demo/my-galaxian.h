@@ -43,6 +43,26 @@ class PlayerShip;
 class GameStats;
 class Explosion;
 
+class Laser
+{
+public:
+    Laser(int x = 0, int y = 0);
+    void run();
+    void draw(Surface &) const;
+    bool & isAlive();
+    Rect & rect();
+
+    void set(int x, int y, int dy);
+    
+    static int timeOfLastLaser_;
+private:
+    bool isAlive_;
+    Rect rect_;
+    Color color_;
+
+    int dx_;
+    int dy_;
+};
 class Fleet
 {
 public:
@@ -85,6 +105,8 @@ protected:
     int row_;
     int col_;
     Rect rect_;
+
+    Laser laser_;
 
     int state_;
     bool isAlive_;
@@ -168,24 +190,6 @@ private:
     int dy_;
 };
 
-class Laser
-{
-public:
-    Laser(int x = 0, int y = 0);
-    void run();
-    void draw(Surface &) const;
-    bool & isAlive();
-    Rect & rect();
-    
-    static int timeOfLastLaser_;
-private:
-    bool isAlive_;
-    Rect rect_;
-    Color color_;
-
-    int dx_;
-    int dy_;
-};
 
 class Explosion
 {

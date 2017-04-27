@@ -91,6 +91,8 @@ protected:
     int dx_;
     int dy_;
     int score_;
+    int attack_initial_x_;
+    int destination_x_;
 };
 
 class AquaAlien : public Alien

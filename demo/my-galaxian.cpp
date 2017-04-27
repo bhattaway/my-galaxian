@@ -635,7 +635,7 @@ void Fleet::run()
             switch_state(1);
             dx_ = -dx_;
         }
-        if (getTicks() - time_of_last_attack_ > 3000)
+        if (getTicks() - time_of_last_attack_ > 1000)
         {
             int randrow = rand() % NUM_ROWS;
             int randcol = rand() % NUM_COLS;
@@ -644,7 +644,7 @@ void Fleet::run()
                 randrow = rand() % NUM_ROWS;
                 randcol = rand() % NUM_COLS;
             }
-            alien[randrow][randcol]->state() = 2; //attack state
+            alien[randrow][randcol]->state() = 3; //prepare attack state
             time_of_last_attack_ = getTicks();
         }
         for (int row = 0; row < NUM_ROWS; ++row)
@@ -887,12 +887,40 @@ void AquaAlien::run()
                 break;
             case 2: //attack
                 rect_.y += dy_;
+                if (rect_.x - 50 < destination_x_
+                        && destination_x_ < rect_.x + 50)
+                {
+                    dx_ = 1;
+                }
+                else if (rect_.x - 100 < destination_x_
+                        && destination_x_ < rect_.x + 100)
+                {
+                    dx_ = 3;
+                }
+                else if (rect_.x - 250 < destination_x_
+                        && destination_x_ < rect_.x + 250)
+                {
+                    dx_ = 4;
+                }
+                if (destination_x_ > rect_.x)
+                {
+                    rect_.x += dx_;
+                }
+                else
+                {
+                    rect_.x -= dx_;
+                }
                 if (rect_.y > H)
                 {
+                    dx_ = 2;
                     rect_.x = 32 * col_ + Fleet::rect_.x - 10;
                     rect_.y = 32;
                     state_ = Fleet::fleet_state;
                 }
+                break;
+            case 3: //prepare attack
+                destination_x_ = rand() % (W - 32);
+                state_ = 2;
                 break;
         }
     }
@@ -966,6 +994,9 @@ void RedAlien::run()
                     state_ = Fleet::fleet_state;
                 }
                 break;
+            case 3: //prepare attack
+                state_ = 2;
+                break;
         }
     }
 }
@@ -1030,14 +1061,50 @@ void PurpleAlien::run()
                 }
                 break;
             case 2: //attack
-                dy_ = 3;
                 rect_.y += dy_;
+                if (rect_.x - 10 < destination_x_
+                        && destination_x_ < rect_.x + 10)
+                {
+                    destination_x_ = rand() % (W - 32);
+                }
+                if (rect_.x - 50 < destination_x_
+                        && destination_x_ < rect_.x + 50)
+                {
+                    dx_ = 2;
+                }
+                else if (rect_.x - 100 < destination_x_
+                        && destination_x_ < rect_.x + 100)
+                {
+                    dx_ = 3;
+                }
+                else if (rect_.x - 250 < destination_x_
+                        && destination_x_ < rect_.x + 250)
+                {
+                    dx_ = 4;
+                }
+                if (destination_x_ > rect_.x)
+                {
+                    rect_.x += dx_;
+                }
+                else
+                {
+                    rect_.x -= dx_;
+                }
                 if (rect_.y > H)
                 {
+                    dx_ = 2;
                     rect_.x = 32 * col_ + Fleet::rect_.x - 10;
                     rect_.y = 32;
                     state_ = Fleet::fleet_state;
                 }
+                break;
+            case 3: //initialize attack
+                attack_initial_x_ = rect_.x;
+                destination_x_ = rand() % (W - 32);
+
+                dx_ = 5;
+
+                state_ = 2; //attack state
                 break;
         }
     }
@@ -1110,6 +1177,9 @@ void YellowAlien::run()
                     rect_.y = 32;
                     state_ = Fleet::fleet_state;
                 }
+                break;
+            case 3: //prepare attack
+                state_ = 2;
                 break;
         }
     }
